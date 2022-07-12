@@ -1,0 +1,34 @@
+{
+    "packages": [
+        {
+            "package": "cpp11",
+            "version":"0.4.2"
+        },
+        {
+            "package": "flexdashboard",
+            "version":"0.5.2"
+        },
+        {
+            "package": "dplyr",
+            "version":"1.0.9"
+        },
+        {
+            "package": "tidyr",
+            "version":"1.2.0"
+        },
+        {
+            "package": "highcharter",
+            "version":"0.9.4"
+        },
+        {
+            "package": "coronavirus",
+            "version":"0.3.32"
+        },
+        {
+            "package": "lubridate",
+            "version":"1.8.0"
+        }
+        
+       
+    ]
+}
