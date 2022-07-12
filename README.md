@@ -36,3 +36,15 @@ In this tutorial, we will focus on setting automation for flexdashboard. We will
 - Deploy the dashboard on Github Pages
 - Set automation with Github Actions to refresh the data and update the dashboard
 
+**TODO - add architect diagram**
+
+### Set environment with Docker
+
+
+``` shell
+.
+├── Dockerfile
+├── build_docker.sh
+├── install_packages.R
+└── packages.json
+```
