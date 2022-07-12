@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  rstudio:
+    image: "$FLEX_IMAGE" 
+    ports:
+      - "8787:8787"
+    volumes:
+      - type: "bind"
+        source: "$TUTORIAL_WORKING_DIR"
+        target: "/home/rstudio"
+      - type: "bind"
+        source: "$RSTUDIO_CONFIG_PATH"
+        target: "/home/rstudio/.config/rstudio"
