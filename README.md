@@ -10,7 +10,19 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 ### TODO
 
 - ADD FOLDER TREE
-
+``` shell
+.
+├── README.md
+├── docker
+│   ├── Dockerfile
+│   ├── build_docker.sh
+│   ├── install_packages.R
+│   └── packages.json
+├── docker-compose.yml
+└── images
+    ├── flexdashboard_example.png
+    └── wip.png
+```
 
 ### Motivation
 
