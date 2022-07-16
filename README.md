@@ -8,10 +8,11 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 <a href='https://github.com/RamiKrispin/coronavirus_dashboard'><img src="images/flexdashboard_example.png" width="100%" /></a> 
 
 ### TODO
--[] Set docker environment
--[] Set Github Pages workflow
--[] Build example dashboard
--[] Set automation with Github Actions
+- Set docker environment
+- Set Github Pages workflow
+- Build example dashboard
+- Set automation with Github Actions
+- Create documenations
 
 
 #### Folder structure
