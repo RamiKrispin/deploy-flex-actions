@@ -8,8 +8,14 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 <a href='https://github.com/RamiKrispin/coronavirus_dashboard'><img src="images/flexdashboard_example.png" width="100%" /></a> 
 
 ### TODO
+-[] Set docker environment
+-[] Set Github Pages workflow
+-[] Build example dashboard
+-[] Set automation with Github Actions
 
-- ADD FOLDER TREE
+
+#### Folder structure
+
 ``` shell
 .
 ├── README.md
@@ -26,7 +32,7 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 
 ### Motivation
 
-As its name implies, the flexdashboard package provides a flexible framework for creating dashboards. It is part of the Rmarkdown ecosystem, and it has the following features:
+As its name implies, the flexdashboard package provides a flexible framework for creating dashboards. It is part of the [Rmarkdown](https://rmarkdown.rstudio.com/) ecosystem, and it has the following features:
 * Seamless layout customization with the use of [rows and columns format](https://pkgs.rstudio.com/flexdashboard/articles/layouts.html)
 * Customize the dashboard theme using CSS or the [bslib](https://pkgs.rstudio.com/flexdashboard/articles/theme.html) package
 * Use [value boxes](https://pkgs.rstudio.com/flexdashboard/articles/using.html#value-boxes) and [gauges](https://pkgs.rstudio.com/flexdashboard/articles/using.html#gauges) and other built-in components
