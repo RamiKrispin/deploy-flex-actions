@@ -67,6 +67,7 @@ A typical workflow will include the following steps
 
 - **Scope** - define the project requirements and derive dependencies
 - **Dockerize** - set initial development environment 
+- **Prototype** - build the functions and plots on Rmarkdown
 - **Develop** - start to build the dashboard
 - **Deploy** - push the dashboard to Github Pages 
 - **Automate** - build the dashboard refresh with Github Actions
@@ -79,8 +80,21 @@ Typically, you may update the Docker image throughout the development process if
 
 ## Dashboard scope
 
+Create a worldwide COBID19 tracker which will include:
+- Confirmed cases distribution by contenant
+- Cases distribution by country:
+    - Confirmed
+    - Death
+
+Expected dependencies:
+- Dashboard - [flexdashboard](https://pkgs.rstudio.com/flexdashboard/index.html)
+- Data - [coronavirus](https://github.com/RamiKrispin/coronavirus)
+- Data visualization - [highcharter](https://jkunst.com/highcharter/index.html)
+- Utility - [dplyr](https://dplyr.tidyverse.org/), [tidyr](https://tidyr.tidyverse.org/), [lubridate](https://lubridate.tidyverse.org/)
+
 ## Set Docker environment
 
+There are multiple approaches to setting a Docker environment using the `Dockerfile`. My approach is to minimize the `Dockerfile` by using utility files and automating the process with `bash` scrip. This makes the `Dockerfile` cleaner with fewer layers, yielding a smaller image size.  Below is the tree of the `docker` folder:
 
 ``` shell
 .
@@ -89,6 +103,88 @@ Typically, you may update the Docker image throughout the development process if
 ├── install_packages.R
 └── packages.json
 ```
+
+This includes the following four files:
+- `Dockerfile` - the image manifest provides a set of instructions for the docker engine about how to build the image
+- `build_docker.sh` - a bash script to automate the build of the image and push to Docker Hub
+- `install_packages.R` - an R script that installs the dependencies of the project as set in the `packages.json` file
+- `packages.json` - a JSON file with a list of the project packages and their version
+
+
+### The Dockerfile
+
+Let's now review the `Dockerfile`:
+
+``` Dockerfile
+# Pulling Rocker image with RStudio and R version 4.2
+FROM rocker/rstudio:4.2
+
+# Disabling the authentication step
+ENV USER="rstudio"
+CMD ["/usr/lib/rstudio-server/bin/rserver", "--server-daemonize", "0", "--auth-none", "1"]
+
+# Install jq to parse json files
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    jq \
+    libxml2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# installing R packages
+RUN mkdir packages
+COPY install_packages.R packages/
+COPY packages.json packages/
+RUN Rscript packages/install_packages.R
+
+EXPOSE 8787
+
+```
+This Dockerfile has the following five components:
+- **Base image** - We will use the [rocker/rstudio:4.2`](https://hub.docker.com/r/rocker/rstudio/tags) image as the base image for this project. This image contains R version 4.2.0 and the RStudio server installed and will be used as the development environment.
+- **Disabling the authentication** - By default, the RStudio server requires a user name and password. We will use the `ENV` command to define the environment variable `USER` and set it as `rstudio` and the `CMD` command to disable the authentication step. # TODO check if first step is needed...
+- **Installing Dependencies** - Generally, rocker images will have most of the Debian packages, C/C++ compliers, and other dependencies. However, often you may need to install additional requirements based on the packages you add to the image. In our case, we will use the `RUN` command to install [jq](https://stedolan.github.io/jq/), a command line tool for parsing `JSON` files, and the [libxml2](https://packages.debian.org/search?keywords=libxml2) Debian package that is required to install the [lubridate](https://lubridate.tidyverse.org/) package.
+- **Installing the R packages** - To install additional R packages, we will make a new directory inside the image called `packages` and copy the `install_packages.R` and `packages.json` files that will be used to install the required R packages. 
+- **Expose port** - Last but not least, we will use the `EXPOSE` command to expose port 8787 (default) for the RStudio server (as set on the base docker).
+
+We will define all required packages and their versions on the `packages.json` file:
+``` json
+{
+    "packages": [
+        {
+            "package": "cpp11",
+            "version":"0.4.2"
+        },
+        {
+            "package": "flexdashboard",
+            "version":"0.5.2"
+        },
+        {
+            "package": "dplyr",
+            "version":"1.0.9"
+        },
+        {
+            "package": "tidyr",
+            "version":"1.2.0"
+        },
+        {
+            "package": "highcharter",
+            "version":"0.9.4"
+        },
+        {
+            "package": "coronavirus",
+            "version":"0.3.32"
+        },
+        {
+            "package": "lubridate",
+            "version":"1.8.0"
+        }
+        
+       
+    ]
+}
+
+```
+
+## Prototype the dashboard data visualization
 
 ## Dashboard development
 
