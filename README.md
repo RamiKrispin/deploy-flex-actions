@@ -75,10 +75,6 @@ A typical workflow will include the following steps
 
 Typically, you may update the Docker image throughout the development process if additional requirements (or dependencies) beyond the scope will be needed.
 
-
-**TODO - add architect diagram**
-
-
 ## Dashboard scope
 
 Create a worldwide COVID19 tracker which will include:
@@ -112,7 +108,16 @@ We will leverage the [highcharter](https://jkunst.com/highcharter/index.html) pa
 
 <br>
 
-Once we have defined the scope and have a simple prototype, we better understand the dashboard requirements (e.g., data, packages, etc.), and we can move to the next step - setting the Docker environment. 
+Once we have defined the scope and have a simple prototype, we better understand the dashboard requirements (e.g., data, packages, etc.), and we can start thinking about the dashboard's general architect. The below diagram describes the general workflow we will use to create the dashboard:
+
+- **Data source** - coronavirus package
+- **Orchestration** - Github Actions
+- **Environment** - Docker
+- **Deployment** - Github Pages 
+
+<br>
+
+<img src="images/deployment architect.png" width="100%" />
 
 <br>
 
