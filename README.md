@@ -95,7 +95,26 @@ Expected dependencies:
 
 ## Dashboard prototype
 
-TODO
+After setting a clear scope, I found it useful to prototype and put your thoughts on a piece of paper, [drow.io](https://www.diagrams.net/), iPad, or any other tool you find useful. The goal is to translate the scope into some sketches to understand the data inputs, required transformation, type of visualization, etc. In addition, a narrow scope with a good prototype will potentially save you some time and cycles when starting to code the dashboard. That being said, you should stay open-minded to changes in the final output, as what may look nice on the sketch may turn out less appealing on the final output. 
+
+<img src="images/dash_prototype01.png" width="100%" />
+
+<br>
+As the focus of this tutorial is on the deployment itself and not on the data visualization, we will keep the dashboard simple and create the following three plots:
+
+- Daily new cases (either by continent or worldwide), using scatter plot with trend line
+- Daily death cases (either by continent or worldwide), using scatter plot with trend line
+- Distribution of cases by country using treemap plot
+
+We will leverage the [highcharter](https://jkunst.com/highcharter/index.html) package to create those plots.
+
+<img src="images/dash_prototype02.png" width="100%" />
+
+<br>
+
+Once we have defined the scope and have a simple prototype, we better understand the dashboard requirements (e.g., data, packages, etc.), and we can move to the next step - setting the Docker environment. 
+
+<br>
 
 ## Set Docker environment
 
@@ -345,7 +364,5 @@ If the above packages (in the `packages.json` file) meet your requirements, then
 
 ## Set automation with Github Actions
 
-
-### Set environment with Docker
 
 
