@@ -67,9 +67,9 @@ We will cover the two and discuss the pros and cons of each approach.
 A typical workflow will include the following steps
 
 - **Scope** - define the project requirements and derive dependencies
-- **Prototype** - build the functions and plots on Rmarkdown
+- **Prototype** - transform the scope into a sketch
 - **Dockerize** - set initial development environment 
-- **Develop** - start to build the dashboard
+- **Develop** - build the dashboard functionality and data visualization
 - **Deploy** - push the dashboard to Github Pages 
 - **Automate** - build the dashboard refresh with Github Actions
 
