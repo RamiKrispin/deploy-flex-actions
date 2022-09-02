@@ -30,5 +30,17 @@
         }
         
        
+    ],
+    "debug_mode": [
+        {
+            "package": "ragg",
+            "version":"1.2.2"
+        }
+    ],
+    "python_packages": [
+        {
+            "package": "radian",
+            "version": "0.6.3"
+        }
     ]
 }
