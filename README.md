@@ -359,9 +359,15 @@ docker-compose down
 
 If the above packages (in the `packages.json` file) meet your requirements, then you are good to go and start to develop (with minimal effort in setting your global environment variables). If you have additional or different requirements, you can update the `packages.json` file according to your environment requirements and re-build the docker image using the `build_docker.sh` file. The only caveat for this is that for some packages, you may need to install additional **Debian** packages and may need to update the `Dockerfile` accordingly.
 
+### Setting VScode environment
 
+TODO...
 
 ## Prototype the dashboard data visualization
+
+I found it useful, before starting to build the dashboard to prototype the data visualization on [Rmarkdown](https://rmarkdown.rstudio.com/) (and now on [Quarto](https://quarto.org/)) document. From this step and moving forward, all the dashboard development and testing will be inside the development container, either with RStudio Server or VScode.
+
+
 
 ## Dashboard development
 
