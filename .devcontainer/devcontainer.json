@@ -1,0 +1,32 @@
+{
+    "name": "flexdashboard-development",
+    "image": "${localEnv:FLEX_IMAGE}",
+    "customizations": {
+        "vscode": {
+            // Set *default* container specific settings.json values on container create.
+            "settings": {
+                "python.defaultInterpreterPath": "/opt/conda/envs/flex_dashboard/bin/python"
+            },
+            "extensions": [
+                "quarto.quarto",
+                "ms-azuretools.vscode-docker",
+                "ms-python.python",
+                "rdebugger.r-debugger",
+                "ms-vscode-remote.remote-containers",
+                "yzhang.markdown-all-in-one",
+                "reditorsupport.r",
+                "redhat.vscode-yaml",
+                "REditorSupport.r",
+                "REditorSupport.r-lsp", 
+                "RDebugger.r-debugger" 
+            ]
+        }
+    },
+    "mounts": [        
+        "source=${localEnv:TUTORIAL_WORKING_DIR},target=/home/,type=bind,consistency=cache"],
+    "remoteEnv": {
+        "VAR1": "TEST1",
+        "VAR2": "TEST2"
+    },
+    "postCreateCommand": "radian"
+}
