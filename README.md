@@ -155,6 +155,16 @@ Docker can build images automatically by reading the instructions from a Dockerf
 # Pulling Rocker image with RStudio and R version 4.2
 FROM rocker/rstudio:4.2
 
+# Setting environment variables
+ARG CONDA_ENV=flex_dashboard
+ENV CONDA_ENV=$CONDA_ENV
+
+ARG PYTHON_VER=3.8
+ENV PYTHON_VER=$PYTHON_VER
+
+ARG QUARTO_VERSION=1.1.149
+ENV QUARTO_VERSION=$QUARTO_VERSION
+
 # Disabling the authentication step
 ENV USER="rstudio"
 CMD ["/usr/lib/rstudio-server/bin/rserver", "--server-daemonize", "0", "--auth-none", "1"]
@@ -163,25 +173,71 @@ CMD ["/usr/lib/rstudio-server/bin/rserver", "--server-daemonize", "0", "--auth-n
 RUN apt-get update && apt-get install -y --no-install-recommends \
     jq \
     libxml2-dev \
+    zlib1g \
+    g++-11 \
+    libz-dev \
+    freetype2-demos \
+    libpng-dev \
+    libtiff-dev \
+    libjpeg-dev \
+    make \
+    fontconfig \
+    libfribidi-dev \
+    libharfbuzz-dev \
+    libfontconfig1-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # installing R packages
 RUN mkdir packages
 COPY install_packages.R packages/
+COPY install_python.R packages/
 COPY packages.json packages/
 RUN Rscript packages/install_packages.R
 
-EXPOSE 8787
+# Installing Quarto
+COPY install_quarto.sh packages/
+RUN  bash packages/install_quarto.sh $QUARTO_VERSION
 
+
+# Install miniconda
+RUN sudo apt update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    && sudo add-apt-repository -y ppa:deadsnakes/ppa \
+    && sudo apt update 
+
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh \
+    && /bin/bash ~/miniconda.sh -b -p /opt/conda \
+    && export PATH=/opt/conda/bin:$PATH \
+    && conda init bash \
+    && conda install conda-build
+
+# Set environment
+RUN . /root/.bashrc \
+    && conda create -y --name $CONDA_ENV python=$PYTHON_VER 
+
+RUN echo "conda activate $CONDA_ENV" >> ~/.bashrc
+RUN Rscript packages/install_python.R
+
+EXPOSE 8787
 ```
-The above Dockerfile has the following five components:
+The above Dockerfile has the following components:
 - **Base image** - We will use the [rocker/rstudio:4.2`](https://hub.docker.com/r/rocker/rstudio/tags) image as the base image for this project. This image contains R version 4.2.0 and the RStudio server installed and will be used as the development environment.
-- **Disabling the authentication** - By default, the RStudio server requires a user name and password. We will use the `ENV` command to define the environment variable `USER` and set it as `rstudio` and the `CMD` command to disable the authentication step. # TODO check if the first step is needed...
+- **Setting arguments and environment variables** - We will use the `ARG` argument to set the build arguments and the `ENV` argument to set the environment variables. The main distinction between the `ARG` and the `ENV` arguments:
+    - The `ARG` argument enables the user to assign variables dynamically during the build time. 
+    - The `ENV` argument enables to set of environment variables that are available both during the build and run time (as opposed to `ARG`s variables that are available only during the build time).
+    - One way to set dynamic environment variables is to set them first as arguments and then assign them to environment variables. Not sure if this is the best practice, but it is a convenience to have some of the arguments available after the build time, mainly for debugging.
+
+    To run R in VScode, we will use [radian](https://github.com/randy3k/radian), an alternative R console with multiline editing and rich syntax highlight. The radian is Python based therefore, we will set Conda to set a Python environment. The `CONDA_ENV` and `PYTHON_VER` will be used to set the Conda environment and its version. In addition, we will use the `QUARTO_VERSION` argument to set the Quarto version.
+
+- **Disabling the authentication** - By default, the RStudio server requires a user name and password. We will use the `ENV` command to define the environment variable `USER` and set it as `rstudio` and the `CMD` command to disable the authentication step.
 - **Installing Dependencies** - Generally, rocker images will have most of the Debian packages, C/C++ compliers, and other dependencies. However, often you may need to install additional requirements based on the packages you add to the image. In our case, we will use the `RUN` command to install [jq](https://stedolan.github.io/jq/), a command line tool for parsing `JSON` files, and the [libxml2](https://packages.debian.org/search?keywords=libxml2) Debian package that is required to install the [lubridate](https://lubridate.tidyverse.org/) package.
 - **Installing the R packages** - To install additional R packages, we will make a new directory inside the image called `packages` and copy the `install_packages.R` and `packages.json` files that will be used to install the required R packages. 
+- **Install Quarto** - We will use the `install_quarto.sh` bash script to install Quarto. We will use the `QUARTO_VERSION` argument to set the version (1.1.149).
+- **Set Python Environment** - We will set Python environment with Conda and than install [radian](https://github.com/randy3k/radian). We will set Python environment with Conda and then install [radian](https://github.com/randy3k/radian). This step requires if you are planning to develop with VScode (or down the road when [flexdashboard](https://quarto.org/docs/faq/rmarkdown.html#i-use-x-bookdown-blogdown-etc..-what-is-the-quarto-equivalent) will be available for Python, [Julia](https://julialang.org/), and [Observable](https://observablehq.com/) with [Quatro](https://quarto.org/))
 - **Expose port** - Last but not least, we will use the `EXPOSE` command to expose port 8787 (default) for the RStudio server (as set on the base docker).
 
 We will define all required packages and their versions on the `packages.json` file:
+
 ``` json
 {
     "packages": [
@@ -206,19 +262,46 @@ We will define all required packages and their versions on the `packages.json` f
             "version":"0.9.4"
         },
         {
+            "package": "readr",
+            "version":"2.1.2"
+        },
+        {
             "package": "coronavirus",
             "version":"0.3.32"
         },
         {
             "package": "lubridate",
             "version":"1.8.0"
+        },
+        {
+            "package": "languageserver",
+            "version":"0.3.13"
         }
         
        
+    ],
+    "debug_mode": [
+        {
+            "package": "ragg",
+            "version":"1.2.2"
+        }
+    ],
+    "python_packages": [
+        {
+            "package": "radian",
+            "version": "0.6.3"
+        }
     ]
 }
 
 ```
+
+Note that the JSON file has three sections:
+
+- `packages` - Defines the R packages to install from CRAN (or CRAN archive)
+- `debug` - used when some packages "refused" to get installed and enables a quick debugging mode to track the error (or identify which Debian packages are missing...)
+- `python_packages` - defines the Python packages to install on the conda environment
+
 
 To build the Docker image, we will use `build_docker.sh` file, which builds and push the image to Docker Hub:
 
@@ -227,7 +310,11 @@ To build the Docker image, we will use `build_docker.sh` file, which builds and 
 
 echo "Build the docker"
 
-docker build . -t rkrispin/flex_dash_env:dev.0.0.0.9000
+docker build . --progress=plain \
+               --build-arg QUARTO_VERSION=1.1.149 \
+               --build-arg CONDA_ENV=flex_dashboard \
+               --build-arg PYTHON_VER=3.8 \
+               -t rkrispin/flex_dash_env:dev.0.0.0.9000
 
 if [[ $? = 0 ]] ; then
 echo "Pushing docker..."
@@ -237,7 +324,7 @@ echo "Docker build failed"
 fi
 ```
 
-This `bash` script simply builds the docker and tags it as `rkrispin/flex_dash_env:dev.0.0.0.9000`, and then, if the build was successful, push it to Docker Hub. To execute this script from the command line:
+This `bash` script simply builds the docker and tags it as `rkrispin/flex_dash_env:dev.0.0.0.9000`, and then, if the build was successful, push it to Docker Hub. As you can see on the `docker build` command, we are using the `--build-arg` argument to define the `Dockerfile` arguments. To execute this script from the command line:
 
 ```shell
 bash build_docker.sh
