@@ -21,12 +21,20 @@
             "version":"0.9.4"
         },
         {
+            "package": "readr",
+            "version":"2.1.2"
+        },
+        {
             "package": "coronavirus",
             "version":"0.3.32"
         },
         {
             "package": "lubridate",
             "version":"1.8.0"
+        },
+        {
+            "package": "languageserver",
+            "version":"0.3.13"
         }
         
        

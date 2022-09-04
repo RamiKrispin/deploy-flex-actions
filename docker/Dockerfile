@@ -8,6 +8,8 @@ ENV CONDA_ENV=$CONDA_ENV
 ARG PYTHON_VER=3.8
 ENV PYTHON_VER=$PYTHON_VER
 
+ARG QUARTO_VERSION=1.1.149
+ENV QUARTO_VERSION=$QUARTO_VERSION
 
 # Disabling the authentication step
 ENV USER="rstudio"
@@ -38,6 +40,11 @@ COPY install_python.R packages/
 COPY packages.json packages/
 RUN Rscript packages/install_packages.R
 
+# Installing Quarto
+COPY install_quarto.sh packages/
+RUN  bash packages/install_quarto.sh $QUARTO_VERSION
+
+
 # Install miniconda
 RUN sudo apt update && apt-get install -y --no-install-recommends \
     software-properties-common \
@@ -54,6 +61,7 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86
 RUN . /root/.bashrc \
     && conda create -y --name $CONDA_ENV python=$PYTHON_VER 
 
+RUN echo "conda activate $CONDA_ENV" >> ~/.bashrc
 RUN Rscript packages/install_python.R
 
 EXPOSE 8787
