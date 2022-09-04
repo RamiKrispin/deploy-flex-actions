@@ -470,6 +470,8 @@ docker-compose down
 
 The main advantage of VScode is the seamless integration with Docker. While it is a great development framework when working with multiple languages (e.g., R, Python, bash, etc.) and setting Dockerfiles, on the other hand, it is not the ideal development environment when working with flexdashboard. That might change in the future with Quarto.
 
+**Setting**
+
 To set containerized environment with VScode, we will create the `devcontainer.json` file under the `.devcontainer` folder. The `devcontainer.json` has the functionality of the `docker-compose.yml` file, and it provides to VScode a set of instructions about the Docker environment. This is the `devcontainer.json` we will use in this project:
 
 ``` JSON
@@ -516,7 +518,19 @@ The extensions section, as the name implies, defines the environment extensions
 - `remoteEnv` - can be used to set environment variables. As example, I set two environment variables `VAR1` and `VAR2`
 - `postCreateCommand` - set the command to run after the launch of the container is done. In the case above, we set `radian` to be the default.
 
+**Open the folder inside a container**
 
+Once the `.devcontainer.json` file is ready, it is straightforward to open the folder inside a container. Let's start by opening the project folder - on the main menu, go to `File` -> `Open Folder...`, and select the project folder. In the screenshot below, you can see the project folder marked with a blue rectangle:
+
+<img src="images/vscode01.png" width="100%" />
+
+The next step is to click on the `><` symbol (marked with the green rectangle) on the bottom left corner, which will open a menu on the top of the screen, and select the `Reopen in Container` option.
+
+You can test your environment by opening the terminal. You should expect to see a similar view as in the screenshot below (depending on your setting). The Conda environment name that you logged in is in the brackets (e.g., `flex_dashboard` marked in purple). If you type `radian` or `r`,  it will open the default R console with **radian** (marked with green). In addition, you can see at the bottom the project name as defined on the `devcontainer.json` file (marked in yellow) and the branch name (marked in blue).
+
+<img src="images/vscode02.png" width="100%" />
+
+Last but not least, if you make any changes in the image, you will have to refresh the environment by selecting the `Rebuild Container` option (click on the `><` symbol to open the container menu).
 
 ## Castumize the image
 
@@ -529,11 +543,11 @@ I found it useful, before starting to build the dashboard to prototype the data 
 
 
 
-## Dashboard development
+# Dashboard development
 
-## Deploy on Github Pages
+# Deploy on Github Pages
 
-## Set automation with Github Actions
+# Set automation with Github Actions
 
 
 
