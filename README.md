@@ -15,7 +15,7 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 - Create documentations
 
 
-### Folder structure
+## Folder structure
 
 ``` shell
 .
@@ -54,18 +54,18 @@ As its name implies, the flexdashboard package provides a flexible framework for
 
 This tutorial will focus on deploying flexdashboard to Github Pages and automating the dashboard data refresh with Github Actions and Docker. Github and Docker offer both enterprise and free tools. Throughout this tutorial, we will leverage the free versions.
 
-### When to use Github Actions?
+## When to use Github Actions?
 
 Github Actions is a CI/CD tool enabling scheduling and triggering jobs (or scripts). In the context of R, here are some useful use cases:
 - Package testing - Triggering R CMD Check when pushing new code (see this [example](https://github.com/RamiKrispin/coronavirus/actions/workflows/main.yml)) 
 - Data automation - Build data pipelines with [Rmarkdown](https://ramikrispin.github.io/coronavirus/data_pipelines/covid19_cases.html) or pull data from [APIs](https://github.com/RamiKrispin/USelectricity/blob/fe742c8756f885a9cbb6dcc9bcf24e1e1ede69ce/.github/workflows/main.yml#L19)
 - Refresh data, rerender flexdashboard and redeploy on Github Pages (see [coronavirus](https://ramikrispin.github.io/coronavirus_dashboard/) and [covid19italy](https://ramikrispin.github.io/italy_dash/) packages supporting dashboards)
 
-### Why Docker?
+## Why Docker?
 
 Docker is a CI/CD tool that enables seamless code deployment from dev to prod. By creating OS-level virtualization, it can package an application and its dependencies in a virtual container. Or in other words, the code that was developed and tested in the dev env will run with the exact same env (e.g., the same OS, compilers, packages, and other dependencies) on prod. Docker can run natively on Linux systems and with Docker Desktop (or equivalent) on macOS and Windows OS.
 
-### Docker + R = ❤️❤️❤️
+## Docker + R = ❤️❤️❤️
 
 Docker is a great tool for automating tasks in R, in particular, when deploying R code with Github Actions (e.g., R CMD Check, Rmarkdown, Quarto, or Flexdashboard). In this tutorial, we will build a development environment and use it to build the dashboard and then leverage it to deploy it on Github Actions. There are two main approaches for developing with Docker in R:
 - RStudio server 
@@ -73,7 +73,7 @@ Docker is a great tool for automating tasks in R, in particular, when deploying 
 
 We will cover the two and discuss the pros and cons of each approach.
 
-### Workflow
+## Workflow
 
 A typical workflow will include the following steps
 
@@ -132,7 +132,7 @@ Once we have defined the scope and have a simple prototype, we better understand
 
 <br>
 
-## Set Docker environment
+# Set Docker environment
 
 There are multiple approaches for setting a Docker environment with the [Dockerfile](https://docs.docker.com/engine/reference/builder/). My approach is to minimize the `Dockerfile` by using utility files and automating the process with `bash` scrip. This makes the `Dockerfile` cleaner, yielding a smaller image size with fewer layers. Below is the tree of the `docker` folder in this tutorial:
 
@@ -156,7 +156,7 @@ This includes the following four files:
 
 Before diving into more details, let's review the `Dockerfile`.
 
-### The Dockerfile
+## The Dockerfile
 
 The `Dockerfile` provides a set of instructions for the docker engine to build the image. You can think about it as the image's recipe. It has its own unique and intuitive syntax following this structure:
 
@@ -345,7 +345,7 @@ This `bash` script simply builds the docker and tags it as `rkrispin/flex_dash_e
 bash build_docker.sh
 ```
 
-### Lunching the development environment
+## Lunching the development environment
 
 We will review two approaches to setting a development environment using:
 - RStudio server
@@ -353,7 +353,7 @@ We will review two approaches to setting a development environment using:
 
 Of the two, when working with flaxdashboard, RStudio is the preferred choice. There are some advantages to developing with VScode, mainly when working in a dockerized environment and multiple languages. On the other hand, it is less suitable to work with Rmarkdown documents such as flexdashboard.
 
-#### Setting environment with RStudio server
+### Setting environment with RStudio server
 
 There are multiple methods to spin a docker image into a running containter. Before going to the robust method using the `docker-compose`, let's review the basic method with the `run` command:
 
@@ -466,7 +466,7 @@ docker-compose down
 ```
 
 
-#### Setting environment with VScoce
+### Setting environment with VScoce
 
 The main advantage of VScode is the seamless integration with Docker. While it is a great development framework when working with multiple languages (e.g., R, Python, bash, etc.) and setting Dockerfiles, on the other hand, it is not the ideal development environment when working with flexdashboard. That might change in the future with Quarto.
 
@@ -518,15 +518,12 @@ The extensions section, as the name implies, defines the environment extensions
 
 
 
-### Castumize the image
+## Castumize the image
 
 If the above packages (in the `packages.json` file) meet your requirements, then you are good to go and start to develop (with minimal effort in setting your global environment variables). If you have additional or different requirements, you can update the `packages.json` file according to your environment requirements and re-build the docker image using the `build_docker.sh` file. The only caveat for this is that for some packages, you may need to install additional **Debian** packages and may need to update the `Dockerfile` accordingly.
 
-### Setting VScode environment
 
-TODO...
-
-## Prototype the dashboard data visualization
+# Prototype the dashboard data visualization
 
 I found it useful, before starting to build the dashboard to prototype the data visualization on [Rmarkdown](https://rmarkdown.rstudio.com/) (and now on [Quarto](https://quarto.org/)) document. From this step and moving forward, all the dashboard development and testing will be inside the development container, either with RStudio Server or VScode.
 
