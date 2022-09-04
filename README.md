@@ -347,6 +347,14 @@ bash build_docker.sh
 
 ### Lunching the development environment
 
+We will review two approaches to setting a development environment using:
+- RStudio server
+- VScode
+
+Of the two, when working with flaxdashboard, RStudio is the preferred choice. There are some advantages to developing with VScode, mainly when working in a dockerized environment and multiple languages. On the other hand, it is less suitable to work with Rmarkdown documents such as flexdashboard.
+
+#### Setting environment with RStudio server
+
 There are multiple methods to spin a docker image into a running containter. Before going to the robust method using the `docker-compose`, let's review the basic method with the `run` command:
 
 ``` shell
@@ -456,6 +464,59 @@ Like before, we added the detach argument `-d` to keep the terminal free after l
 ``` shell
 docker-compose down
 ```
+
+
+#### Setting environment with VScoce
+
+The main advantage of VScode is the seamless integration with Docker. While it is a great development framework when working with multiple languages (e.g., R, Python, bash, etc.) and setting Dockerfiles, on the other hand, it is not the ideal development environment when working with flexdashboard. That might change in the future with Quarto.
+
+To set containerized environment with VScode, we will create the `devcontainer.json` file under the `.devcontainer` folder. The `devcontainer.json` has the functionality of the `docker-compose.yml` file, and it provides to VScode a set of instructions about the Docker environment. This is the `devcontainer.json` we will use in this project:
+
+``` JSON
+{
+    "name": "flexdashboard-development",
+    "image": "${localEnv:FLEX_IMAGE}",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/opt/conda/envs/flex_dashboard/bin/python"
+            },
+            "extensions": [
+                "quarto.quarto",
+                "ms-azuretools.vscode-docker",
+                "ms-python.python",
+                "rdebugger.r-debugger",
+                "ms-vscode-remote.remote-containers",
+                "yzhang.markdown-all-in-one",
+                "reditorsupport.r",
+                "redhat.vscode-yaml",
+                "REditorSupport.r",
+                "REditorSupport.r-lsp", 
+                "RDebugger.r-debugger" 
+            ]
+        }
+    },
+    "mounts": [        
+        "source=${localEnv:TUTORIAL_WORKING_DIR},target=/home/,type=bind,consistency=cache"],
+    "remoteEnv": {
+        "VAR1": "TEST1",
+        "VAR2": "TEST2"
+    },
+    "postCreateCommand": "radian"
+}
+```
+
+**Key arguments:**
+
+- `name` - defines the environment name
+- `image` - defines the image that will be used for the environment. Similar to the `docker-compose.yml`, we will use the `FLEX_IMAGE` environment variable to set the image name
+- `python.defaultInterpreterPath` under the setting argument is used to define the default Python path for the Python interpreter. We will use the conda environment we set on the Dockerfile (`flex_dashboard`) as the default.
+The extensions section, as the name implies, defines the environment extensions
+- `mount` - enables binding between the local folders and those inside the docker. The nice thing about VScode is that you don't need to mount your project folder with the container. As example, I mount the local folder (using the TUTORIAL_WORKING_DIR environment variable) with the home directory inside the Docker.
+- `remoteEnv` - can be used to set environment variables. As example, I set two environment variables `VAR1` and `VAR2`
+- `postCreateCommand` - set the command to run after the launch of the container is done. In the case above, we set `radian` to be the default.
+
+
 
 ### Castumize the image
 
