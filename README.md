@@ -20,14 +20,25 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 ``` shell
 .
 ├── README.md
+├── dataviz_prototype.qmd
+├── diagrams
+│   └── deployment architect.drawio
 ├── docker
 │   ├── Dockerfile
 │   ├── build_docker.sh
 │   ├── install_packages.R
+│   ├── install_python.R
+│   ├── install_quarto.sh
 │   └── packages.json
 ├── docker-compose.yml
 └── images
+    ├── dash_prototype01.png
+    ├── dash_prototype02.png
+    ├── deployment architect.png
     ├── flexdashboard_example.png
+    ├── rstudio01.png
+    ├── rstudio02.png
+    ├── rstudio03.png
     └── wip.png
 ```
 
@@ -130,6 +141,8 @@ There are multiple approaches for setting a Docker environment with the [Dockerf
 ├── Dockerfile
 ├── build_docker.sh
 ├── install_packages.R
+├── install_python.R
+├── install_quarto.sh
 └── packages.json
 ```
 
@@ -137,6 +150,8 @@ This includes the following four files:
 - `Dockerfile` - the image manifest provides a set of instructions for the docker engine about how to build the image
 - `build_docker.sh` - a bash script to automate the build of the image and push to Docker Hub
 - `install_packages.R` - an R script that installs the dependencies of the project as set in the `packages.json` file
+- `install_packages.R` - an R script that installs the Python dependencies of the project as set in the `packages.json` file
+- `install_quarto.sh` - a Bash script that install Quarto
 - `packages.json` - a JSON file with a list of the project packages and their version
 
 Before diving into more details, let's review the `Dockerfile`.
