@@ -606,11 +606,11 @@ This will direct the output of the flexdashboard files to the `docs` folder, whi
 
 It is strightforward to create a new flexdashboard template with RStudio, using the `File` menu and select `New File` and `R markdown...` options:
 
-<img src="images/file_menu.png" width="100%" />
+<img src="images/file_menu.png" width="50%" />
 
 Next, on the `New R Markdown` window, select `From Template` option and then the `Flex Dashboard` option:
 
-<img src="images/rmarkdown_template.png" width="100%" />
+<img src="images/rmarkdown_template.png" width="50%" />
 
 This will generate the following template (showing only the `yaml` header):
 
