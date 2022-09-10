@@ -654,13 +654,20 @@ You can check if you setting of your `_site.yml` file done properly by rendering
 ```
 
 
-Once we have the dashboard functionality prototyped on the Quarto doc, it is a straightforward to populate the visualization on the dashboard template:
+Once we have the dashboard functionality prototyped on the Quarto doc, it is straightforward to populate the visualization on the dashboard template:
 
 <img src="images/dashboard.png" width="100%" />
 
+YAY! we have the dashboard set, let's deploy it on Github pages.
+
 # Deploy on Github Pages
 
+By this point, about 95% of the work is done. Setting a Github Page simply required a website files under the docs folder, which we already created. 
 
+## Setting 
+On the repo main menu, select the `Settings` tab and then the `Pages` option:
+
+<img src="images/github_pages.png" width="100%" />
 
 # Set automation with Github Actions
 
