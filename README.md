@@ -19,29 +19,16 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 
 ``` shell
 .
+├── README.md
+├── _site.yml
 ├── data
 ├── dev
-│   └── dataviz_prototype_files
-│       └── libs
 ├── diagrams
 ├── docker
+├── docker-compose.yml
 ├── docs
-│   ├── data
-│   ├── dev
-│   │   └── dataviz_prototype_files
-│   ├── diagrams
-│   ├── docker
-│   ├── images
-│   └── site_libs
-│       ├── bootstrap-3.3.5
-│       ├── header-attrs-2.16
-│       ├── highchart-binding-0.9.4
-│       ├── highcharts-9.3.1
-│       ├── htmlwidgets-1.5.4
-│       ├── jquery-3.6.0
-│       ├── proj4js-2.3.15
-│       └── stickytableheaders-0.1.19
-└── images
+├── images
+└── index.Rmd
 ```
 
 ## Motivation
