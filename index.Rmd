@@ -1,0 +1,268 @@
+---
+title: "COVID-19 Tracker"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+# Dependencies
+library(flexdashboard)
+# Functions
+`%>%` <- magrittr::`%>%`
+source("./dev/functions.R")
+# Setting the data requirements 
+df <- coronavirus::refresh_coronavirus_jhu()
+load("./data/gis_codes.RData")
+load("./data/gis_mapping.RData")
+
+df2 <- df %>%
+  dplyr::filter(location_type == "country",
+                !is.na(location_code),
+                data_type != "recovered_new") %>%
+  dplyr::left_join(gis_codes %>% 
+                     dplyr::select(-lat, - long) %>%
+                     dplyr::filter(combined_key == country_region, 
+                                               is.na(province_state)), by = c("location" = "combined_key")) %>%
+  dplyr::left_join(continent_mapping %>% dplyr::select(continent_name, continent_code, iso2), by = "iso2")
+
+
+d <- df2 %>% 
+  dplyr::filter(location_type == "country",
+                data_type == "cases_new") %>%
+  dplyr::group_by(location, continent_name) %>%
+  dplyr::summarise(total_cases = sum(value), .groups = "drop") %>%
+  dplyr::mutate(perc = 100 * total_cases / sum(total_cases)) %>%
+  dplyr::arrange(-total_cases) 
+
+# Fix missing values
+d$continent_name[which(d$location == "South Korea")] <- "Asia"
+d$continent_name[which(d$location == "Kosovo")] <- "Europe"
+
+
+df3 <- df %>% 
+  dplyr::filter(location_type == "country",
+                data_type != "recovered_new") %>%
+  dplyr::group_by(date, data_type) %>%
+  dplyr::summarise(total = sum(value), .groups = "drop") %>%
+  tidyr::pivot_wider(names_from = data_type, values_from = total) 
+
+df3$trend_new_cases <- (df3$cases_new + 
+                        dplyr::lag(df3$cases_new,1) +
+                        dplyr::lag(df3$cases_new,2) + 
+                        dplyr::lag(df3$cases_new,3) +
+                        dplyr::lag(df3$cases_new,4) + 
+                        dplyr::lag(df3$cases_new,5) + 
+                        dplyr::lag(df3$cases_new,6)) /7
+df3$trend_deaths_cases <- (df3$deaths_new + 
+                        dplyr::lag(df3$deaths_new,1) +
+                        dplyr::lag(df3$deaths_new,2) + 
+                        dplyr::lag(df3$deaths_new,3) +
+                        dplyr::lag(df3$deaths_new,4) + 
+                        dplyr::lag(df3$deaths_new,5) + 
+                        dplyr::lag(df3$deaths_new,6)) /7
+```
+
+# Summary
+
+## Column {data-width="600"}
+
+### Daily New Confirmed Cases - Worldwide
+
+```{r}
+highcharter::hchart(df3, "scatter", highcharter::hcaes(x = date, 
+                                                       y = cases_new),
+                    name = "Daily New Cases",
+                    color = "rgba(69, 123, 157, 0.5)",
+  showInLegend = TRUE) %>%
+   highcharter::hc_tooltip(crosshairs = TRUE, pointFormat = "Total Cases: {point.cases_new}") %>%
+   highcharter::hc_add_series(
+    df3, type = "line",  highcharter::hcaes(x = date, 
+                              y = trend_new_cases),
+    color = "rgba(29, 53, 87, 1)",
+    name = "Trend Line", 
+    id = "trend",
+    showInLegend = TRUE)   %>%
+  highcharter::hc_plotOptions(
+    line = list(
+      color = "blue",
+      marker = list(
+        fillColor = "white",
+        lineWidth = 2,
+        radius=1,
+        lineColor = NULL
+      )
+    )
+  ) %>%
+   highcharter::hc_legend( #Not in use, showInLegend = FALSE
+    layout = "vertical",
+    verticalAlign = "top",
+    align = "right",
+     floating = TRUE
+  ) %>%
+   highcharter::hc_xAxis(
+    title = list(text = ""),
+    gridLineWidth = 0,
+    dateTimeLabelFormats = list(day = '%d/%m/%Y'),
+    type = "datetime",
+    reversed = FALSE
+    ) %>%
+   highcharter::hc_yAxis(
+    title = list(text = "Cases"),
+    gridLineWidth = 0,
+    reversed = FALSE
+    ) %>%
+    # highcharter::hc_title(
+    # style = list(color = highcharter::hex_to_rgba("black", 0.5)),
+    # text = "Daily New Confirmed Cases - Worldwide"
+    # ) %>%
+  # highcharter::hc_subtitle(
+  #   style = list(color = hex_to_rgba("black", 0.5)),
+  #   text = "Source: John Hopkins University"
+  #   ) %>%
+  highcharter::hc_caption(text = "Trend line calculated by using 7-days moving average <br>Source: Center for Systems Science and Engineering (CSSE) at Johns Hopkins University") %>%
+    highcharter::hc_tooltip(
+    crosshairs = TRUE,
+    backgroundColor = "#F0F0F0",
+    shared = TRUE, 
+    borderWidth = 5
+    ) 
+```
+
+### Daily Death Cases - Worldwide
+
+```{r}
+highcharter::hchart(df3, "scatter", highcharter::hcaes(x = date, 
+                                                       y = deaths_new),
+                    name = "Daily Death Cases",
+                    color = "rgba(214, 40, 40, 0.5)",
+  showInLegend = TRUE) %>%
+   highcharter::hc_tooltip(crosshairs = TRUE, pointFormat = "Total Cases: {point.deaths_new}") %>%
+   highcharter::hc_add_series(
+    df3, type = "line",  highcharter::hcaes(x = date, 
+                              y = trend_deaths_cases),
+    color = "rgba(29, 53, 87, 1)",
+    name = "Trend Line", 
+    id = "trend",
+    showInLegend = TRUE)   %>%
+  highcharter::hc_plotOptions(
+    line = list(
+      color = "blue",
+      marker = list(
+        fillColor = "white",
+        lineWidth = 2,
+        radius=1,
+        lineColor = NULL
+      )
+    )
+  ) %>%
+  highcharter::hc_legend( #Not in use, showInLegend = FALSE
+    layout = "vertical",
+    verticalAlign = "top",
+    align = "right",
+     floating = TRUE
+  ) %>%
+   highcharter::hc_xAxis(
+    title = list(text = ""),
+    gridLineWidth = 0,
+    dateTimeLabelFormats = list(day = '%d/%m/%Y'),
+    type = "datetime",
+    reversed = FALSE
+    ) %>%
+   highcharter::hc_yAxis(
+    title = list(text = "Cases"),
+    gridLineWidth = 0,
+    reversed = FALSE
+    ) %>%
+    # highcharter::hc_title(
+    # style = list(color = highcharter::hex_to_rgba("black", 0.5)),
+    # text = "Daily Death Cases - Worldwide"
+    # ) %>%
+  # highcharter::hc_subtitle(
+  #   style = list(color = hex_to_rgba("black", 0.5)),
+  #   text = "Source: John Hopkins University"
+  #   ) %>%
+  # highcharter::hc_caption(text = "Trend line calculated by using 7-days moving average <br>Source: Center for Systems Science and Engineering (CSSE) at Johns Hopkins University") %>%
+  #   highcharter::hc_tooltip(
+  #   crosshairs = TRUE,
+  #   backgroundColor = "#F0F0F0",
+  #   shared = TRUE, 
+  #   borderWidth = 5
+  #   ) %>%
+  highcharter::hc_caption(
+    text = "Trend line calculated by using 7-days moving average <br>Source: Center for Systems Science and Engineering (CSSE) at Johns Hopkins University", 
+    useHTML = TRUE
+    ) 
+```
+
+## Column {data-width="400"}
+
+### Distribution of Total Cases by Country/Continent
+
+```{r}
+pb <- highcharter::hchart(d %>% dplyr::filter(continent_name != "Antarctica"), "packedbubble", highcharter::hcaes(name = location, value = total_cases, group = continent_name)) %>% 
+  highcharter::hc_tooltip(
+    useHTML = TRUE,
+    pointFormat = "<b>{point.name}:</b> {point.value}"
+  )
+
+q95 <- as.numeric(quantile(d$total_cases, .95))
+
+pb %>%
+  highcharter::hc_plotOptions(
+    packedbubble = list(
+      maxSize = "150%",
+      zMin = 0,
+      layoutAlgorithm = list(
+        gravitationalConstant =  0.05,
+        splitSeries =  TRUE, # TRUE to group points
+        seriesInteraction = TRUE,
+        dragBetweenSeries = TRUE,
+        parentNodeLimit = TRUE
+      ),
+      dataLabels = list(
+        enabled = TRUE,
+        format = "{point.name}",
+        filter = list(
+          property = "y",
+          operator = ">",
+          value = q95
+        ),
+        style = list(
+          color = "black",
+          textOutline = "none",
+          fontWeight = "normal"
+        )
+      )
+    )
+  ) 
+pb
+```
+
+# About
+
+**The COVID-19 Tracker Dashboard**
+
+This dashboard is part of the [Deploy Flexdashboard on Github Pages with Github Actions and Docker](https://github.com/RamiKrispin/deploy-flex-actions) tutorial. This tutorial provides a step-by-step guide and a template for deploying and refreshing a [flexdashboard](https://pkgs.rstudio.com/flexdashboard/) dashboard on [Github Pages](https://pages.github.com/) with [Docker](https://www.docker.com/) and [Github Actions](https://github.com/features/actions).
+
+**Data**
+
+The input data for this dashboard is the [coronavirus](https://github.com/RamiKrispin/coronavirus) R package. The data and dashboard is refreshed on a daily bases. The raw data was pulled from the Johns Hopkins University Center for Systems Science and Engineering (JHU CCSE) Coronavirus [repository](https://github.com/CSSEGISandData/COVID-19).
+
+**Packages**
+
+The dashboard uses the following packages:
+
+-   Dashboard - [flexdashboard](https://pkgs.rstudio.com/flexdashboard/index.html)
+-   Data - [coronavirus](https://github.com/RamiKrispin/coronavirus)
+-   Data visualization - [highcharter](https://jkunst.com/highcharter/index.html)
+-   Utility - [dplyr](https://dplyr.tidyverse.org/), [tidyr](https://tidyr.tidyverse.org/), [lubridate](https://lubridate.tidyverse.org/)
+
+**License**
+
+This tutorial is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/) License.
+
+**Connect**
+
+For any question or feedback, you can either open an [issue](https://github.com/RamiKrispin/deploy-flex-actions/issues) or contact me on [Twitter](https://twitter.com/Rami_Krispin).
