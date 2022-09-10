@@ -19,27 +19,29 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 
 ``` shell
 .
-├── README.md
-├── dataviz_prototype.qmd
+├── data
+├── dev
+│   └── dataviz_prototype_files
+│       └── libs
 ├── diagrams
-│   └── deployment architect.drawio
 ├── docker
-│   ├── Dockerfile
-│   ├── build_docker.sh
-│   ├── install_packages.R
-│   ├── install_python.R
-│   ├── install_quarto.sh
-│   └── packages.json
-├── docker-compose.yml
+├── docs
+│   ├── data
+│   ├── dev
+│   │   └── dataviz_prototype_files
+│   ├── diagrams
+│   ├── docker
+│   ├── images
+│   └── site_libs
+│       ├── bootstrap-3.3.5
+│       ├── header-attrs-2.16
+│       ├── highchart-binding-0.9.4
+│       ├── highcharts-9.3.1
+│       ├── htmlwidgets-1.5.4
+│       ├── jquery-3.6.0
+│       ├── proj4js-2.3.15
+│       └── stickytableheaders-0.1.19
 └── images
-    ├── dash_prototype01.png
-    ├── dash_prototype02.png
-    ├── deployment architect.png
-    ├── flexdashboard_example.png
-    ├── rstudio01.png
-    ├── rstudio02.png
-    ├── rstudio03.png
-    └── wip.png
 ```
 
 ## Motivation
