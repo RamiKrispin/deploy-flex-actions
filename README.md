@@ -665,9 +665,34 @@ YAY! we have the dashboard set, let's deploy it on Github pages.
 By this point, about 95% of the work is done. Setting a Github Page simply required a website files under the docs folder, which we already created. 
 
 ## Setting 
-On the repo main menu, select the `Settings` tab and then the `Pages` option:
+On the repo main menu, select the `Settings` (marked in purple) tab and then the `Pages` option (marked in green) to open the Github Pages settings 
 
 <img src="images/github_pages.png" width="100%" />
+
+Under the `Source` option (marked in blue) select `Deploy from a branch`, and then select the `docs` folder (marked in orange). Last but not least, click the `Save` button (marked in yellow).
+
+It might take few minutes to Github to render the website and you should see the link for the website on that page (refresh the page if you cannot see it). Github Pages use the following website address patern:
+
+``` shell
+https://GITHUB_USER_NAME.github.io/REPO_NAME/
+```
+
+In this case the link for this tutorial dashboard is:
+
+https://ramikrispin.github.io/deploy-flex-actions/
+
+
+
+Under the `Source` option (marked in blue) select `Deploy from a branch`, and then select the `docs` folder (marked in orange). Last but not least, click the `Save` button (marked in yellow).
+
+It might take a few minutes for Github to render the website, and you should see the link for the website on that page (refresh the page if you cannot see it). Github Pages use the following website address pattern:
+
+```
+https://GITHUB_USER_NAME.github.io/REPO_NAME/
+```
+In this case, the link for this tutorial dashboard is:
+https://ramikrispin.github.io/deploy-flex-actions/
+
 
 # Set automation with Github Actions
 
