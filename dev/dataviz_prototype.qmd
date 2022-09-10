@@ -186,6 +186,16 @@ pb %>%
 
 ### Aggregate view
 
+We will apply the following data transformation:
+
+-   Filter recovered cases (are no longer provided)
+
+-   Filter non country cases (e.g., states, province, etc.)
+
+-   Group by date and case type (new case, death)
+
+-   Create a trend line calculating moving average with the last 7 days
+
 ```{r}
 df2 <- df %>% 
   dplyr::filter(location_type == "country",
@@ -214,6 +224,10 @@ tail(df2)
 
 ### Plot daily new cases and death
 
+Will start prototyping the plot using the daily cases and then regenerate one for the daily death cases.
+
+Starting with basic line plot:
+
 ```{r}
 highcharter::hchart(df2, "line", highcharter::hcaes(x = date, y = cases_new),
                     name = "Daily New Cases",
@@ -224,6 +238,8 @@ highcharter::hchart(df2, "line", highcharter::hcaes(x = date, y = deaths_new),
                     name = "Daily Death Cases",
   showInLegend = TRUE)
 ```
+
+Let's try scatter plot and add the trend line, titles and legends:
 
 ```{r}
 highcharter::hchart(df2, "scatter", highcharter::hcaes(x = date, 
@@ -284,3 +300,67 @@ highcharter::hchart(df2, "scatter", highcharter::hcaes(x = date,
     borderWidth = 5
     ) 
 ```
+
+Now let's reproduce this plot for the death cases:
+
+```{r}
+highcharter::hchart(df2, "scatter", highcharter::hcaes(x = date, 
+                                                       y = deaths_new),
+                    name = "Daily Death Cases",
+                    color = "rgba(214, 40, 40, 0.5)",
+  showInLegend = TRUE) %>%
+   highcharter::hc_tooltip(crosshairs = TRUE, pointFormat = "Total Cases: {point.deaths_new}") %>%
+   highcharter::hc_add_series(
+    df2, type = "line",  highcharter::hcaes(x = date, 
+                              y = trend_deaths_cases),
+    color = "rgba(29, 53, 87, 1)",
+    name = "Trend Line", 
+    id = "trend",
+    showInLegend = TRUE)   %>%
+  highcharter::hc_plotOptions(
+    line = list(
+      color = "blue",
+      marker = list(
+        fillColor = "white",
+        lineWidth = 2,
+        radius=1,
+        lineColor = NULL
+      )
+    )
+  ) %>%
+  highcharter::hc_legend( #Not in use, showInLegend = FALSE
+    layout = "horizontal",
+    verticalAlign = "bottom",
+    align = "center",
+    valueDecimals = 0
+  ) %>%
+   highcharter::hc_xAxis(
+    title = list(text = ""),
+    gridLineWidth = 0,
+    dateTimeLabelFormats = list(day = '%d/%m/%Y'),
+    type = "datetime",
+    reversed = FALSE
+    ) %>%
+   highcharter::hc_yAxis(
+    title = list(text = "Cases"),
+    gridLineWidth = 0,
+    reversed = FALSE
+    ) %>%
+    highcharter::hc_title(
+    style = list(color = highcharter::hex_to_rgba("black", 0.5)),
+    text = "Daily Death Cases - Worldwide"
+    ) %>%
+  # highcharter::hc_subtitle(
+  #   style = list(color = hex_to_rgba("black", 0.5)),
+  #   text = "Source: John Hopkins University"
+  #   ) %>%
+  highcharter::hc_caption(text = "Trend line calculated by using 7-days moving average <br>Source: Center for Systems Science and Engineering (CSSE) at Johns Hopkins University") %>%
+    highcharter::hc_tooltip(
+    crosshairs = TRUE,
+    backgroundColor = "#F0F0F0",
+    shared = TRUE, 
+    borderWidth = 5
+    ) 
+```
+
+After creating the three plots (bubble and scatter), we can go head and start build the dashboard.
