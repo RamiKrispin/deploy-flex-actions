@@ -1,0 +1,58 @@
+{
+    "packages": [
+        {
+            "package": "cpp11",
+            "version":"0.4.2"
+        },
+        {
+            "package": "flexdashboard",
+            "version":"0.5.2"
+        },
+        {
+            "package": "dplyr",
+            "version":"1.0.9"
+        },
+        {
+            "package": "tidyr",
+            "version":"1.2.0"
+        },
+        {
+            "package": "highcharter",
+            "version":"0.9.4"
+        },
+        {
+            "package": "readr",
+            "version":"2.1.2"
+        },
+        {
+            "package": "coronavirus",
+            "version":"0.3.32"
+        },
+        {
+            "package": "lubridate",
+            "version":"1.8.0"
+        },
+        {
+            "package": "languageserver",
+            "version":"0.3.13"
+        },
+        {
+            "package": "viridis",
+            "version":"0.6.2"
+        }
+        
+       
+    ],
+    "debug_mode": [
+        {
+            "package": "ragg",
+            "version":"1.2.2"
+        }
+    ],
+    "python_packages": [
+        {
+            "package": "radian",
+            "version": "0.6.3"
+        }
+    ]
+}

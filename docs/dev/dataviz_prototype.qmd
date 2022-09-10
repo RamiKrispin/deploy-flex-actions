@@ -1,0 +1,368 @@
+---
+title: "Dataviz Prototype"
+format: html
+editor: visual
+---
+
+## Load the data
+
+Will start by loading the COVID19 data from the `coronavirus` package:
+
+```{r}
+`%>%` <- magrittr::`%>%`
+df <- coronavirus::refresh_coronavirus_jhu()
+head(df)
+```
+
+The following function, from the [Covid19 Tracker Dashboard](https://github.com/RamiKrispin/coronavirus_dashboard), loading from the John Hopkins COVID19 tracker repository the GIS codes mapping:
+
+```{r}
+get_gis_codes <- function(url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/UID_ISO_FIPS_LookUp_Table.csv"){
+  gis_codes <- readr::read_csv(url, 
+                               col_types = readr::cols(FIPS = readr::col_number(),
+                                                       Admin2 = readr::col_character())
+  )
+  names(gis_codes) <- tolower(names(gis_codes))
+  names(gis_codes)[which(names(gis_codes) == "long_")] <- "long"
+  return(gis_codes)
+} 
+
+gis_codes <- get_gis_codes()
+head(gis_codes)
+
+save(gis_codes, file = "data/gis_codes.RData")
+```
+
+To avoid issues during the run time on Github Actions (e.g., broken URL, changes in the data structure, etc.), I will save the table as `RData` object (see code under `./dev/gis_mapping.R`. Let's load it:
+
+```{r}
+load("../data/gis_mapping.RData")
+head(gis_code_mapping)
+```
+
+The following functions, also taken from the COVID19 Tracker dashboard, merge the COVID19 table with the country level metadata (e.g., population) and create a summary table on the country level:
+
+```{r}
+coronavirus_agg <- function(coronavirus_jhu = coronavirus::refresh_coronavirus_jhu(),
+                            gis_codes = get_gis_codes()){
+  
+  df <- coronavirus_jhu %>%
+    dplyr::filter(location_type == "country") %>%
+    dplyr::left_join(gis_codes %>% 
+                       dplyr::filter(is.na(province_state)) %>%
+                       dplyr::filter(country_region == combined_key) %>%
+                       dplyr::select(location = country_region, population), 
+                     by = c("location"))
+  
+  
+  df_agg <- df %>% 
+    dplyr::filter(location_type == "country",
+                  data_type != "recovered_new") %>%
+    # dplyr::filter(location == combined_key ) %>%
+    tidyr::pivot_wider(names_from = data_type, values_from = value) %>%
+    dplyr::group_by(location) %>%
+    dplyr::summarise(confirmed = sum(cases_new),
+                     death = sum(deaths_new)) %>%
+    dplyr::arrange(- death) %>%
+    dplyr::left_join(gis_codes %>% 
+                       dplyr::filter(is.na(province_state)) %>%
+                       dplyr::select(location = combined_key, population) %>% 
+                       dplyr::distinct(),
+                     by = "location") %>%
+    dplyr::mutate(rate = death / confirmed,
+                  rate_pop = death / population,
+                  death_per_100k = death / (population / 100000)) %>%
+    dplyr::arrange(-death_per_100k) %>%
+    dplyr::filter(!is.na(population))
+  
+  return(df_agg)
+}
+```
+
+Let's see the output:
+
+```{r}
+df_agg <- coronavirus_agg(coronavirus_jhu = df,
+                          gis_codes = gis_code_mapping)
+
+head(df_agg)
+```
+
+### Merge the COVID19 table with the GIS codes
+
+```{r}
+df2 <- df %>%
+  dplyr::filter(location_type == "country",
+                !is.na(location_code),
+                data_type != "recovered_new") %>%
+  dplyr::left_join(gis_codes %>% 
+                     dplyr::select(-lat, - long) %>%
+                     dplyr::filter(combined_key == country_region, 
+                                               is.na(province_state)), by = c("location" = "combined_key")) %>%
+  dplyr::left_join(continent_mapping %>% dplyr::select(continent_name, continent_code, iso2), by = "iso2")
+
+head(df2)
+```
+
+## Aggregate by country
+
+```{r}
+d <- df2 %>% 
+  dplyr::filter(location_type == "country",
+                data_type == "cases_new") %>%
+  dplyr::group_by(location, continent_name) %>%
+  dplyr::summarise(total_cases = sum(value), .groups = "drop") %>%
+  dplyr::mutate(perc = 100 * total_cases / sum(total_cases)) %>%
+  dplyr::arrange(-total_cases) 
+
+
+head(d)
+
+# Fail to merge
+d[which(is.na(d$continent_name)),]
+
+# Fix missing values
+d$continent_name[which(d$location == "South Korea")] <- "Asia"
+d$continent_name[which(d$location == "Kosovo")] <- "Europe"
+
+d[which(is.na(d$continent_name)),]
+
+```
+
+### Create treemap plot by country
+
+```{r}
+highcharter::hchart(d, "treemap", 
+                    highcharter::hcaes(x = location, value = total_cases, color = perc)) %>%
+  highcharter::hc_colorAxis(stops = highcharter::color_stops(colors = viridis::viridis(n = 200,  option = "D")))
+```
+
+### Bubble Plot by continent and country
+
+Using the packed bubble [example](https://jkunst.com/highcharter/articles/highcharts.html#packedbubble) from the highcharter package:
+
+```{r}
+
+pb <- highcharter::hchart(d %>% dplyr::filter(continent_name != "Antarctica"), "packedbubble", highcharter::hcaes(name = location, value = total_cases, group = continent_name)) %>% 
+  highcharter::hc_tooltip(
+    useHTML = TRUE,
+    pointFormat = "<b>{point.name}:</b> {point.value}"
+  )
+
+pb
+```
+
+```{r}
+
+q95 <- as.numeric(quantile(d$total_cases, .95))
+
+pb %>%
+  highcharter::hc_plotOptions(
+    packedbubble = list(
+      maxSize = "150%",
+      zMin = 0,
+      layoutAlgorithm = list(
+        gravitationalConstant =  0.05,
+        splitSeries =  TRUE, # TRUE to group points
+        seriesInteraction = TRUE,
+        dragBetweenSeries = TRUE,
+        parentNodeLimit = TRUE
+      ),
+      dataLabels = list(
+        enabled = TRUE,
+        format = "{point.name}",
+        filter = list(
+          property = "y",
+          operator = ">",
+          value = q95
+        ),
+        style = list(
+          color = "black",
+          textOutline = "none",
+          fontWeight = "normal"
+        )
+      )
+    )
+  ) 
+```
+
+### Aggregate view
+
+We will apply the following data transformation:
+
+-   Filter recovered cases (are no longer provided)
+
+-   Filter non country cases (e.g., states, province, etc.)
+
+-   Group by date and case type (new case, death)
+
+-   Create a trend line calculating moving average with the last 7 days
+
+```{r}
+df2 <- df %>% 
+  dplyr::filter(location_type == "country",
+                data_type != "recovered_new") %>%
+  dplyr::group_by(date, data_type) %>%
+  dplyr::summarise(total = sum(value), .groups = "drop") %>%
+  tidyr::pivot_wider(names_from = data_type, values_from = total) 
+
+df2$trend_new_cases <- (df2$cases_new + 
+                        dplyr::lag(df2$cases_new,1) +
+                        dplyr::lag(df2$cases_new,2) + 
+                        dplyr::lag(df2$cases_new,3) +
+                        dplyr::lag(df2$cases_new,4) + 
+                        dplyr::lag(df2$cases_new,5) + 
+                        dplyr::lag(df2$cases_new,6)) /7
+df2$trend_deaths_cases <- (df2$deaths_new + 
+                        dplyr::lag(df2$deaths_new,1) +
+                        dplyr::lag(df2$deaths_new,2) + 
+                        dplyr::lag(df2$deaths_new,3) +
+                        dplyr::lag(df2$deaths_new,4) + 
+                        dplyr::lag(df2$deaths_new,5) + 
+                        dplyr::lag(df2$deaths_new,6)) /7
+head(df2)
+tail(df2)
+```
+
+### Plot daily new cases and death
+
+Will start prototyping the plot using the daily cases and then regenerate one for the daily death cases.
+
+Starting with basic line plot:
+
+```{r}
+highcharter::hchart(df2, "line", highcharter::hcaes(x = date, y = cases_new),
+                    name = "Daily New Cases",
+  showInLegend = TRUE)
+
+
+highcharter::hchart(df2, "line", highcharter::hcaes(x = date, y = deaths_new),
+                    name = "Daily Death Cases",
+  showInLegend = TRUE)
+```
+
+Let's try scatter plot and add the trend line, titles and legends:
+
+```{r}
+highcharter::hchart(df2, "scatter", highcharter::hcaes(x = date, 
+                                                       y = cases_new),
+                    name = "Daily New Cases",
+                    color = "rgba(69, 123, 157, 0.5)",
+  showInLegend = TRUE) %>%
+   highcharter::hc_tooltip(crosshairs = TRUE, pointFormat = "Total Cases: {point.cases_new}") %>%
+   highcharter::hc_add_series(
+    df2, type = "line",  highcharter::hcaes(x = date, 
+                              y = trend_new_cases),
+    color = "rgba(29, 53, 87, 1)",
+    name = "Trend Line", 
+    id = "trend",
+    showInLegend = TRUE)   %>%
+  highcharter::hc_plotOptions(
+    line = list(
+      color = "blue",
+      marker = list(
+        fillColor = "white",
+        lineWidth = 2,
+        radius=1,
+        lineColor = NULL
+      )
+    )
+  ) %>%
+  highcharter::hc_legend( #Not in use, showInLegend = FALSE
+    layout = "horizontal",
+    verticalAlign = "bottom",
+    align = "center",
+    valueDecimals = 0
+  ) %>%
+   highcharter::hc_xAxis(
+    title = list(text = ""),
+    gridLineWidth = 0,
+    dateTimeLabelFormats = list(day = '%d/%m/%Y'),
+    type = "datetime",
+    reversed = FALSE
+    ) %>%
+   highcharter::hc_yAxis(
+    title = list(text = "Cases"),
+    gridLineWidth = 0,
+    reversed = FALSE
+    ) %>%
+    highcharter::hc_title(
+    style = list(color = highcharter::hex_to_rgba("black", 0.5)),
+    text = "Daily New Confirmed Cases - Worldwide"
+    ) %>%
+  # highcharter::hc_subtitle(
+  #   style = list(color = hex_to_rgba("black", 0.5)),
+  #   text = "Source: John Hopkins University"
+  #   ) %>%
+  highcharter::hc_caption(text = "Trend line calculated by using 7-days moving average <br>Source: Center for Systems Science and Engineering (CSSE) at Johns Hopkins University") %>%
+    highcharter::hc_tooltip(
+    crosshairs = TRUE,
+    backgroundColor = "#F0F0F0",
+    shared = TRUE, 
+    borderWidth = 5
+    ) 
+```
+
+Now let's reproduce this plot for the death cases:
+
+```{r}
+highcharter::hchart(df2, "scatter", highcharter::hcaes(x = date, 
+                                                       y = deaths_new),
+                    name = "Daily Death Cases",
+                    color = "rgba(214, 40, 40, 0.5)",
+  showInLegend = TRUE) %>%
+   highcharter::hc_tooltip(crosshairs = TRUE, pointFormat = "Total Cases: {point.deaths_new}") %>%
+   highcharter::hc_add_series(
+    df2, type = "line",  highcharter::hcaes(x = date, 
+                              y = trend_deaths_cases),
+    color = "rgba(29, 53, 87, 1)",
+    name = "Trend Line", 
+    id = "trend",
+    showInLegend = TRUE)   %>%
+  highcharter::hc_plotOptions(
+    line = list(
+      color = "blue",
+      marker = list(
+        fillColor = "white",
+        lineWidth = 2,
+        radius=1,
+        lineColor = NULL
+      )
+    )
+  ) %>%
+  highcharter::hc_legend( #Not in use, showInLegend = FALSE
+    layout = "horizontal",
+    verticalAlign = "bottom",
+    align = "center",
+    valueDecimals = 0
+  ) %>%
+   highcharter::hc_xAxis(
+    title = list(text = ""),
+    gridLineWidth = 0,
+    dateTimeLabelFormats = list(day = '%d/%m/%Y'),
+    type = "datetime",
+    reversed = FALSE
+    ) %>%
+   highcharter::hc_yAxis(
+    title = list(text = "Cases"),
+    gridLineWidth = 0,
+    reversed = FALSE
+    ) %>%
+    highcharter::hc_title(
+    style = list(color = highcharter::hex_to_rgba("black", 0.5)),
+    text = "Daily Death Cases - Worldwide"
+    ) %>%
+  # highcharter::hc_subtitle(
+  #   style = list(color = hex_to_rgba("black", 0.5)),
+  #   text = "Source: John Hopkins University"
+  #   ) %>%
+  highcharter::hc_caption(text = "Trend line calculated by using 7-days moving average <br>Source: Center for Systems Science and Engineering (CSSE) at Johns Hopkins University") %>%
+    highcharter::hc_tooltip(
+    crosshairs = TRUE,
+    backgroundColor = "#F0F0F0",
+    shared = TRUE, 
+    borderWidth = 5
+    ) 
+```
+
+After creating the three plots (bubble and scatter), we can go head and start build the dashboard.
