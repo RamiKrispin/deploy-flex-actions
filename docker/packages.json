@@ -35,6 +35,10 @@
         {
             "package": "languageserver",
             "version":"0.3.13"
+        },
+        {
+            "package": "viridis",
+            "version":"0.6.2"
         }
         
        
