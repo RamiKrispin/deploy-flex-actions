@@ -9,10 +9,10 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 
 ## TODO
 - Set docker environment ✅ 
-- Set Github Pages workflow
-- Build an example dashboard
+- Set Github Pages workflow ✅ 
+- Build an example dashboard ✅ 
 - Set automation with Github Actions
-- Create documentations
+- Create documentations ✅ 
 
 
 ## Folder structure
@@ -537,15 +537,141 @@ Last but not least, if you make any changes in the image, you will have to refre
 If the above packages (in the `packages.json` file) meet your requirements, then you are good to go and start to develop (with minimal effort in setting your global environment variables). If you have additional or different requirements, you can update the `packages.json` file according to your environment requirements and re-build the docker image using the `build_docker.sh` file. The only caveat for this is that for some packages, you may need to install additional **Debian** packages and may need to update the `Dockerfile` accordingly.
 
 
-# Prototype the dashboard data visualization
+# Code prototype
 
-I found it useful, before starting to build the dashboard to prototype the data visualization on [Rmarkdown](https://rmarkdown.rstudio.com/) (and now on [Quarto](https://quarto.org/)) document. From this step and moving forward, all the dashboard development and testing will be inside the development container, either with RStudio Server or VScode.
+I found it useful to create the dashboard plots based on the scope and prototype steps just before starting to build the dashboard. This enables you to prepare the data, test, and customize your ideas from the prototype step. I typically use a  [Rmarkdown](https://rmarkdown.rstudio.com/) (and now on [Quarto](https://quarto.org/)) document for that. The [Quarto doc](https://github.com/RamiKrispin/deploy-flex-actions/blob/main/dev/dataviz_prototype.qmd) I used for this tutorial is under the dev folder.
+
+From this step forward, all the dashboard development and testing will be inside the development container, either with RStudio Server or VScode. I will use RStudio Server for the data visualization code prototype. To launch the container, use the `docker-compose` command:
+
+```shell
+docker-compose up -d
+```
+
+You should expect the following output:
+``` shell
+Creating network "deploy-flex-actions_default" with the default driver
+Creating deploy-flex-actions_rstudio_1 ... done
+```
+Now, you can go to your browser and open `http://localhost:8787` to open your RStudio Server inside the development container.
+
+Based on the dashboard scope and prototype plan above, we will need the following data transformation:
+
+- Daily cases (confirmed and death) by country
+- Total daily cases (confirmed and death)
+
+For creating those dataset we will use the [coronavirus](https://github.com/RamiKrispin/coronavirus) package, which provides daily snapshot of the John Hopkins COVID19 dataset.
+
+We will use those datasets to generate the following three plots:
+- Total cases distribution by country using a treemap
+- Plot daily new cases using a time series plot
+- Plot daily death cases using a time series plot
+
+After creating the treemap plot, I realized that due to the skewness of the top countries (both percentage and absolute numbers), the use of treemap is less effective:
+
+<img src="images/treemap prototype.png" width="100%" />
+
+Looking into the [highcharter](https://jkunst.com/highcharter/index.html) package documentation, I came across the packed bubble chart [example](https://jkunst.com/highcharter/articles/highcharts.html#packedbubble), and decided to use it instead of the treemap:
+
+<img src="images/packedbubble.png" width="100%" />
+
+To generate this view, I loaded the GIS codes mapping file from the John Hopkins COVID19 tracker [repository](https://github.com/CSSEGISandData/COVID-19). This table was used to add the continent field.
+
+Next, I used the aggregate cases data to create a time series view of the worldwide daily new cases. I started with this basic plot:
+
+<img src="images/new_cases_init_plot.png" width="100%" />
+
+And customized the plot (e.g., add titles, legends, trend line, etc.):
+
+<img src="images/new_cases_plot.png" width="100%" />
+
+Using the same logic, I create similar plot for the new death cases:
+
+<img src="images/new_death_cases_plot.png" width="100%" />
 
 
+Now that we have the data transformation and plots finalized, we can move to the next step and paste the code on the flexdashboard template.
 
 # Dashboard development
 
+Before we start to build the dashboard, we will have to set the `_site.yml`, which enables us to define the site options. We will use the name and output_dir arguments to define the site name and rendering output-dir, respectively:
+
+``` shell
+name: "COVID19 Tracker"
+output_dir: docs
+```
+
+This will direct the output of the flexdashboard files to the `docs` folder, which will enable to build a site with Github Pages.
+
+## Create new flexdashboard template
+
+It is strightforward to create a new flexdashboard template with RStudio, using the `File` menu and select `New File` and `R markdown...` options:
+
+<img src="images/file_menu.png" width="100%" />
+
+Next, on the `New R Markdown` window, select `From Template` option and then the `Flex Dashboard` option:
+
+<img src="images/rmarkdown_template.png" width="100%" />
+
+This will generate the following template (showing only the `yaml` header):
+
+``` R
+---
+title: "Untitled"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+```
+**Note:** As far as I know, there is now built-in Rmarkdown template in VScode, therefore, if you are using VScode, you can copy the above yaml header to your `Rmd` file.
+
+We will name the template file as `index.Rmd`, which will generate an `index.html` that will be used as the website file.
+
+You can check if you setting of your `_site.yml` file done properly by rendering the file. At the first run it expected to create the `docs` folder and create the website files:
+
+```
+.
+├── data
+├── dev
+│   └── dataviz_prototype_files
+│       └── libs
+│           ├── bootstrap
+│           ├── clipboard
+│           ├── highchart-binding-0.9.4
+│           ├── highcharts-9.3.1
+│           │   ├── css
+│           │   ├── custom
+│           │   ├── modules
+│           │   └── plugins
+│           ├── htmlwidgets-1.5.4
+│           ├── jquery-3.5.1
+│           ├── proj4js-2.3.15
+│           └── quarto-html
+├── diagrams
+├── docker
+├── images
+└── site_libs
+    ├── bootstrap-3.3.5
+    │   ├── css
+    │   │   └── fonts
+    │   ├── fonts
+    │   ├── js
+    │   └── shim
+    ├── header-attrs-2.16
+    ├── jquery-3.6.0
+    └── stickytableheaders-0.1.19
+
+29 directories
+```
+
+
+Once we have the dashboard functionality prototyped on the Quarto doc, it is a straightforward to populate the visualization on the dashboard template:
+
+<img src="images/dashboard.png" width="100%" />
+
 # Deploy on Github Pages
+
+
 
 # Set automation with Github Actions
 
