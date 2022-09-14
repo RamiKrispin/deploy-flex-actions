@@ -13,6 +13,8 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 - Build an example dashboard ✅ 
 - Set automation with Github Actions
 - Create documentations ✅ 
+- Add prerequisites 
+- Environment variables setting
 
 
 ## Folder structure
