@@ -15,6 +15,27 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 - Create documentations ✅ 
 - Add prerequisites 
 - Environment variables setting
+- Add VScode settings.json file
+- Add Github codespace setting
+- Add Twitter updates
+
+## Prerequisites
+
+To run this tutorial you will need to install [Docker Desktop](https://www.docker.com/products/docker-desktop/), and set some environment variables.
+
+### Installing Docker Desktop
+
+To install Docker Desktop, go to [Docker Desktop](https://www.docker.com/products/docker-desktop/) and follow the intallation instraction based on your OS. 
+
+**Note:** Different OS may have different requirements and you need to make sure that your machine meets the minimum requirments.
+
+### Setting environment variables
+
+We will use in this tutorial the following environment variables:
+- `FLEX_IMAGE` - The development image name, if you are using the tutorial image it should be set as `rkrispin/flex_dash_env:dev.0.0.0.9000`, otherwise, set it to the one you plan to use
+- `TUTORIAL_WORKING_DIR` - The path for the tutorial folder (e.g., the cloned repository). This variable will be used to bind your Docker container with your local machine. This will be mainly relevante if you are using RStudio server as your working IDE
+- `RSTUDIO_CONFIG_PATH` - The path for the local RStudio config folder. Typically it would be your home directory + `.config/rstudio`. This variable will be used to bind your  
+
 
 
 ## Folder structure
