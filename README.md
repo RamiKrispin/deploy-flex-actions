@@ -13,21 +13,56 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 - Build an example dashboard ✅ 
 - Set automation with Github Actions
 - Create documentations ✅ 
-- Add prerequisites 
-- Environment variables setting
-- Add VScode settings.json file
+- Add prerequisites ✅
+- Environment variables setting ✅
+- Add VScode settings.json file 
 - Add Github codespace setting
 - Add Twitter updates
 
 ## Prerequisites
 
-To run this tutorial, you will need to install [Docker Desktop](https://www.docker.com/products/docker-desktop/), and set some environment variables.
+This tutorial was built under the assumption that no previous (or minimum) experience with Docker. While it covers some of the basics of Docker that will help you deploy a flexdashboard with Docker, it is not a Docker tutorial. I highly recommend checking the following tutorials:
+
+- [Docker Tutorial for Beginners](https://www.youtube.com/watch?v=3c-iBn73dDE&t=5409s&ab_channel=TechWorldwithNana) by TechWorld with Nana
+- [Docker Tutorial for Beginners - A Full DevOps Course on How to Run Applications in Containers](https://www.youtube.com/watch?v=fqMOX6JJhGo&t=6927s&ab_channel=freeCodeCamp.org) by Moonshot (via freeCodeCamp)
+- [Docker Tutorial for Beginners](https://www.youtube.com/watch?v=p28piYY_wv8&t=1534s&ab_channel=Amigoscode) by Amigoscode 
+
+Those tutorials focus on a general introduction to Docker. I also recommend watching the [Docker for R users](https://www.youtube.com/watch?v=oehhZ98o6Zk&t=1077s&ab_channel=useR%21Conference) by [Rahul Sangole](https://github.com/rsangole) and myself, from the useR! 2022 conference.
+
+### General requirements
+
+To run this tutorial, you will need to install [Docker Desktop](https://www.docker.com/products/docker-desktop/), have a [Docker Hub](https://hub.docker.com/) account, and set some environment variables.
+
 
 ### Installing Docker Desktop
 
 To install Docker Desktop, go to [Docker Desktop](https://www.docker.com/products/docker-desktop/) and follow the installation instructions based on your OS. 
 
 **Note:** Different OS may have different requirements, and you want to ensure that your machine meets the minimum requirements.
+
+### Docker Hub
+
+The Docker Hub is the "Github" of container images. It enables you to store your container images and pull and use other users' containers. To register and create an account go to https://hub.docker.com and follow the registration instructions. 
+
+After installing Docker Desktop and setting account on Docker Hub, open on your machine Docker Desktop, and from the commend line login to Docker Hub:
+
+``` shell
+ docker login
+```
+
+For the login, you will have to enter your user name and password, and should expect the following output if the login was successful:
+
+``` shell
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: rkrispin
+Password:
+Login Succeeded
+
+Logging in with your password grants your terminal complete access to your account.
+For better security, log in with a limited-privilege personal access token. Learn more at https://docs.docker.com/go/access-tokens/
+```
+
+
 
 ### Setting environment variables
 
