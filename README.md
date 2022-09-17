@@ -836,12 +836,52 @@ Sat 17 Sep 2022 10:22:34 AM UTC
 
 # Set automation with Github Actions
 
-By this point, we have an environment set with Docker and a dashboard deployed on [Github Pages](https://ramikrispin.github.io/deploy-flex-actions/). The next step is to set a workflow on Github Actions to set daily refresh of the dashboard to get up-to-date with the data available on the [coronavirus](https://github.com/RamiKrispin/coronavirus) package. 
+By this point, we set a development environment with Docker, built a dashboard, and deployed it on [Github Pages](https://ramikrispin.github.io/deploy-flex-actions/). The next step is to set a workflow on Github Actions which will re-render the dashboard daily to get up-to-date with the data available on the [coronavirus](https://github.com/RamiKrispin/coronavirus) package. 
+
+## Set an helper script
+
+While we can run commands directly with Github Actions using the `run` argument (we will cover it in the next section), it is limited to one command at a time. Therefore, I found it more concise and efficient to use a helper script to run multiple steps with a single `run` step. To render the dashboard and update the website with the changes, we will need the following:
+- Run the Rmarkdown render_site function from the terminal
+- Commit the changes back to the `main` branch on the origin (e.g., Github)
+
+The following bash script executes the above requirements:
+
+`bash/render_dashboard.sh`
+``` bash
+echo "Rendering the dashboard..."
+if [[ "$1" = ""  || "$2" = "" ]] ; then
+    echo "The git user.name and/or user.email are missing"
+    exit 0
+else
+    echo "Git user.name is $1"
+    echo "Git user.email is $2"
+fi
 
 
-## What is Github Actions?
+Rscript -e "rmarkdown::render_site()"
 
-TODO ...
+if [[ "$(git status --porcelain)" != "" ]]; then
+    git config --global user.name $1
+    git config --global user.email $2
+    git add *
+    git commit -m "Auto update dashboard"
+    git push
+fi
+```
+
+The script required the following inputs from the user:
+- Github account user name
+- Github account user email
+
+It starts with testing if the user entered the Github account name and email (as used in their Github account). If one or both are missing, it will exit the script. Otherwise, it renders the dashboard and pushes the changes created during the rendering time. 
+
+For example, here is how you should execute your code from the terminal:
+
+``` 
+bash bash/render_dashboard.sh "YOUR_GITHUB_USER_NAME" "YOUR_GITHUB_LOGIN_EMAIL"
+```
+
+The file is saved under the `bash` folder, and we can now continue to the last step - setting the workflow.
 
 ## Creating a Github Actions workflow
 
@@ -855,11 +895,36 @@ In the next step, we will select the type of workflow. There is no specific buil
 
 <img src="images/github_actions_workflow02.png" width="100%" />
 
-Last but not least, we will set the workflow. Github will automatically generate a file named `main.yml` under the folder `.github/workflows/`. For a better context, we will rename the file name to `dashboard_refresh.yml` (marked in yellow) and remove the built-in code example (marked in purple):
+Last but not least, we will set the workflow. Github will automatically generate a file named `main.yml` under the folder `.github/workflows/`. 
 
 <img src="images/github_actions_workflow03.png" width="100%" />
 
+For a better context, we will rename the file name to `dashboard_refresh.yml` (marked in yellow above) and remove the built-in code example (marked in purple) and replace it with the following code:
 
+``` yml
+
+name: Dashboard Refresh
+
+on:
+  schedule:  
+    - cron:  '0 */4 * * *'
+jobs:
+  build:
+    name: refresh the dashboard
+    runs-on: ubuntu-18.04 
+    container: 
+     image: rkrispin/flex_dash_env:dev.0.0.0.9000
+    steps:
+      - name: checkout_repo
+        uses: actions/checkout@v2
+        with: 
+          ref: 'master'
+      - name: Render Rmarkdown
+        run: bash ./bash/dashboard_refresh.sh "YOUR_GITHUB_USER_NAME" "YOUR_GITHUB_LOGIN_EMAIL"
+
+```
+
+After setting the workflow on the Github interface, I recommend syncing the changes on the `origin` with your local branch by using `git pull`. 
 
 # Next steps
 
