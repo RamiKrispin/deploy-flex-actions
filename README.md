@@ -31,7 +31,12 @@ Those tutorials focus on a general introduction to Docker. I also recommend watc
 
 ### General requirements
 
-To run this tutorial, you will need to install [Docker Desktop](https://www.docker.com/products/docker-desktop/), have a [Docker Hub](https://hub.docker.com/) account, and set some environment variables.
+To run this tutorial, you will need the following requirements:
+- Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- Have a [Docker Hub](https://hub.docker.com/) account
+- Have a [Github](https://github.com) account
+- Set some environment variables
+- Either [RStudio Desktop](https://www.rstudio.com/products/rstudio/) (preferred) or [VScode](https://code.visualstudio.com/) IDE 
 
 
 ### Installing Docker Desktop
@@ -753,12 +758,12 @@ https://ramikrispin.github.io/deploy-flex-actions/
 
 # Testing
 
-Before continuing to the automation step with Github Actions, let's test what we built so far. The main goal is to check that we can run the dashboard rendering and update process as we would do with Github Actions. Hence, rendering the dashboard outside of the RStudio server directly through the terminal.
+Before we continue to the automation step with Github Actions, let's test what we have built so far. The main goal of the testing stage is to check the dashboard update step in a similar environment as it would run with Github Actions. Hence, we would render the dashboard inside the container directly from the terminal.
 
-Before starting, make sure restart your development enviroment by running:
+It is always a good practice to restart the container before testing. This will ensure that it will not include any packages you installed during the run time (as opposed to those installed during the build time). To reset the container, let's use the `docker-compose` command:
 
 ``` shell
-docker-compose dow
+docker-compose down
 ```
 And then relaunch the development environment with:
 
@@ -774,18 +779,18 @@ docker ps
 CONTAINER ID   IMAGE                                   COMMAND                  CREATED         STATUS         PORTS                    NAMES
 d594356d8ccc   rkrispin/flex_dash_env:dev.0.0.0.9000   "/usr/lib/rstudio-se…"   3 minutes ago   Up 3 minutes   0.0.0.0:8787->8787/tcp   deploy-flex-actions_rstudio_1
 ```
-Next, let's ssh to the container and open bash terminal using the `docker exec` command:
+Next, let's ssh to the container and open the bash shell on the terminal using the `docker exec` command:
 
 ``` shell
 docker exec -it d594356d8ccc /bin/bash 
 ```
 
-Where, the `d594356d8ccc` is the container ID, from the `docker ps` output above, and `/bin/bash` define the type of shell we want to open. This will lead you to the bash terminal inside the container: 
+Where the `d594356d8ccc` is the container ID, from the `docker ps` output above, and `/bin/bash` defines the type of shell we want to open. This will lead you to the bash terminal inside the container: 
 
 ``` shell
 (flex_dashboard) root@d594356d8ccc:/# 
 ```
-You can note that the `(flex_dashboard)` represents the conda envrionement we set and the `d594356d8ccc` after the `root@` represents the container ID. You can inspect the container root folder with the `ls` command:
+You can note that the `(flex_dashboard)` represents the conda environment we set, and the `d594356d8ccc` after the `root@` represents the container ID. You can inspect the container root folder with the `ls` command:
 
 ``` shell
 (flex_dashboard) root@d594356d8ccc:/# ls
@@ -825,13 +830,22 @@ drwxr-xr-x 10 root root    320 Sep 17 10:16 site_libs
 Sat 17 Sep 2022 10:22:34 AM UTC
 ```
 
-**Note:** You can also check and confirm the changes from your local folder by using the `git status` commend and see changes on `docs` folder (assuming there were no any changes before).
+**Note:** You can also check and confirm the changes from your local folder by using the `git status` command and see changes on the `docs` folder (assuming there were no changes before). Also, make sure you commit those changes before setting the workflow to avoid future git merging conflicts.
 
 
 
 # Set automation with Github Actions
 
-By this point, we have an environment set with Docker and a dashboard deployed on [Github Pages](https://ramikrispin.github.io/deploy-flex-actions/). The next step is to set a workflow on Github Actions to set daily refresh of the dashboard to get up-to-date with the data available on the [coronavirus](https://github.com/RamiKrispin/coronavirus) package. We will start by creating a new workflow by opening the Actions tab (marked in yellow on the screenshot below) on the repository's main menu and selecting the `New workflow` button (marked in green).
+By this point, we have an environment set with Docker and a dashboard deployed on [Github Pages](https://ramikrispin.github.io/deploy-flex-actions/). The next step is to set a workflow on Github Actions to set daily refresh of the dashboard to get up-to-date with the data available on the [coronavirus](https://github.com/RamiKrispin/coronavirus) package. 
+
+
+## What is Github Actions?
+
+TODO ...
+
+## Creating a Github Actions workflow
+
+Let's start with creating a new workflow by opening the Actions tab (marked in yellow on the screenshot below) on the repository's main menu and selecting the `New workflow` button (marked in green).
 
 <img src="images/github_actions_workflow01.png" width="100%" />
 
