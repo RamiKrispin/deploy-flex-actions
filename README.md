@@ -20,9 +20,10 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 
 ## Prerequisites
 
-This tutorial was built under the assumption that no previous (or minimum) experience with Docker. While it covers some of the basics of Docker that will help you deploy a flexdashboard with Docker, it is not a Docker tutorial. I highly recommend checking the following tutorials:
+This tutorial was built under the assumption that no previous (or minimum) experience with Docker and Github Actions. While it covers some of the basics of Docker that will help you deploy a flexdashboard with Docker, it is not a Docker tutorial. If you wish to dive deeper into Docker and Github Actions, I highly recommend checking the following tutorials:
 
 - [Docker Tutorial for Beginners](https://www.youtube.com/watch?v=3c-iBn73dDE&t=5409s&ab_channel=TechWorldwithNana) by TechWorld with Nana
+- [GitHub Actions Tutorial - Basic Concepts and CI/CD Pipeline with Docker](https://www.youtube.com/watch?v=R8_veQiYBjI&t=7s&ab_channel=TechWorldwithNana) by TechWorld with Nana
 - [Docker Tutorial for Beginners - A Full DevOps Course on How to Run Applications in Containers](https://www.youtube.com/watch?v=fqMOX6JJhGo&t=6927s&ab_channel=freeCodeCamp.org) by Moonshot (via freeCodeCamp)
 - [Docker Tutorial for Beginners](https://www.youtube.com/watch?v=p28piYY_wv8&t=1534s&ab_channel=Amigoscode) by Amigoscode 
 
