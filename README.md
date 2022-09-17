@@ -38,7 +38,7 @@ To run this tutorial, you will need to install [Docker Desktop](https://www.dock
 
 To install Docker Desktop, go to [Docker Desktop](https://www.docker.com/products/docker-desktop/) and follow the installation instructions based on your OS. 
 
-**Note:** Different OS may have different requirements, and you want to ensure that your machine meets the minimum requirements.
+**Note:** Different OS (i.e., Linux, Mac, Windows) may have different system requirements. The requirements information by OS are available on the Docker Desktop [documentation](https://docs.docker.com/desktop/) under the install section.
 
 ### Docker Hub
 
@@ -751,10 +751,101 @@ https://GITHUB_USER_NAME.github.io/REPO_NAME/
 In this case, the link for this tutorial dashboard is:
 https://ramikrispin.github.io/deploy-flex-actions/
 
+# Testing
+
+Before continuing to the automation step with Github Actions, let's test what we built so far. The main goal is to check that we can run the dashboard rendering and update process as we would do with Github Actions. Hence, rendering the dashboard outside of the RStudio server directly through the terminal.
+
+Before starting, make sure restart your development enviroment by running:
+
+``` shell
+docker-compose dow
+```
+And then relaunch the development environment with:
+
+``` shell
+docker-compose up -d
+```
+
+You can confirm that your container is up by using the `docker ps` command:
+
+``` shell
+docker ps
+
+CONTAINER ID   IMAGE                                   COMMAND                  CREATED         STATUS         PORTS                    NAMES
+d594356d8ccc   rkrispin/flex_dash_env:dev.0.0.0.9000   "/usr/lib/rstudio-se…"   3 minutes ago   Up 3 minutes   0.0.0.0:8787->8787/tcp   deploy-flex-actions_rstudio_1
+```
+Next, let's ssh to the container and open bash terminal using the `docker exec` command:
+
+``` shell
+docker exec -it d594356d8ccc /bin/bash 
+```
+
+Where, the `d594356d8ccc` is the container ID, from the `docker ps` output above, and `/bin/bash` define the type of shell we want to open. This will lead you to the bash terminal inside the container: 
+
+``` shell
+(flex_dashboard) root@d594356d8ccc:/# 
+```
+You can note that the `(flex_dashboard)` represents the conda envrionement we set and the `d594356d8ccc` after the `root@` represents the container ID. You can inspect the container root folder with the `ls` command:
+
+``` shell
+(flex_dashboard) root@d594356d8ccc:/# ls
+bin  boot  dev  etc  home  init  lib  lib32  lib64  libexec  libx32  media  mnt  opt  packages  proc  rocker_scripts  root  run  sbin  srv  sys  tmp  usr  var
+```
+
+We can find our local bind folder (as set on the `docker-compose.yml` file) inside the container under the `home/rstudio` folder:
+
+``` shell
+(flex_dashboard) root@d594356d8ccc:/# cd home/rstudio/
+(flex_dashboard) root@d594356d8ccc:/home/rstudio# ls
+bash  data  dev  diagrams  docker  docker-compose.yml  docs  images  index.Rmd  README.md  _site.yml
+```
+
+Let's now test the rendering process by calling the Rmarkdown `render_site` command from the terminal with the `Rscript` command:
+
+``` shell
+(flex_dashboard) root@d594356d8ccc:/home/rstudio# Rscript -e "rmarkdown::render_site()"
+```
+
+To confirm that the dashboard was rendered, go to the `docs` folder and check the time the files were modified last with the `ls -l` command:
+
+``` shell
+(flex_dashboard) root@d594356d8ccc:/home/rstudio# cd docs
+(flex_dashboard) root@d594356d8ccc:/home/rstudio/docs# ls -l
+total 752
+drwxr-xr-x  3 root root     96 Sep 17 10:16 bash
+drwxr-xr-x  4 root root    128 Sep 17 10:16 data
+drwxr-xr-x  7 root root    224 Sep 17 10:16 dev
+drwxr-xr-x  4 root root    128 Sep 17 10:16 diagrams
+drwxr-xr-x  8 root root    256 Sep 17 10:16 docker
+-rw-r--r--  1 root root    306 Sep 17 10:16 docker-compose.yml
+drwxr-xr-x 25 root root    800 Sep 17 10:16 images
+-rw-r--r--  1 root root 762993 Sep 17 10:16 index.html
+drwxr-xr-x 10 root root    320 Sep 17 10:16 site_libs
+(flex_dashboard) root@d594356d8ccc:/home/rstudio/docs# date
+Sat 17 Sep 2022 10:22:34 AM UTC
+```
+
+**Note:** You can also check and confirm the changes from your local folder by using the `git status` commend and see changes on `docs` folder (assuming there were no any changes before).
+
+
 
 # Set automation with Github Actions
 
-TODO...
+By this point, we have an environment set with Docker and a dashboard deployed on [Github Pages](https://ramikrispin.github.io/deploy-flex-actions/). The next step is to set a workflow on Github Actions to set daily refresh of the dashboard to get up-to-date with the data available on the [coronavirus](https://github.com/RamiKrispin/coronavirus) package. We will start by creating a new workflow by opening the Actions tab (marked in yellow on the screenshot below) on the repository's main menu and selecting the `New workflow` button (marked in green).
+
+<img src="images/github_actions_workflow01.png" width="100%" />
+
+**Note:** The deployment to Github Pages triggered a daily workflow to refresh and deploy the website on Github Pages (marked in purple). Although the name of this action state "build and deploy", it is not refreshing and rendering the dashboard. Therefore we will have to run a dedicated action for that.
+
+In the next step, we will select the type of workflow. There is no specific built-in workflow for our use case. Therefore we will select the set up a workflow yourself (marked in green) option:
+
+<img src="images/github_actions_workflow02.png" width="100%" />
+
+Last but not least, we will set the workflow. Github will automatically generate a file named `main.yml` under the folder `.github/workflows/`. For a better context, we will rename the file name to `dashboard_refresh.yml` (marked in yellow) and remove the built-in code example (marked in purple):
+
+<img src="images/github_actions_workflow03.png" width="100%" />
+
+
 
 # Next steps
 
