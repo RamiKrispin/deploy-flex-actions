@@ -2,7 +2,7 @@ name: Dashboard Refresh
 
 on:
   schedule:  
-    - cron:  '0 */4 * * *'
+    - cron:  '0 */1 * * *'
 jobs:
   build:
     name: refresh the dashboard
@@ -13,6 +13,6 @@ jobs:
       - name: checkout_repo
         uses: actions/checkout@v2
         with: 
-          ref: 'master'
+          ref: 'main'
       - name: Render Rmarkdown
         run: bash ./bash/dashboard_refresh.sh "RamiKrispin" "ramkrisp@umich.edu"
