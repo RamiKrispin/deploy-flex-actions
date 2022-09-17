@@ -30,7 +30,7 @@ get_gis_codes <- function(url = "https://raw.githubusercontent.com/CSSEGISandDat
 gis_codes <- get_gis_codes()
 head(gis_codes)
 
-save(gis_codes, file = "data/gis_codes.RData")
+save(gis_codes, file = "../data/gis_codes.RData")
 ```
 
 To avoid issues during the run time on Github Actions (e.g., broken URL, changes in the data structure, etc.), I will save the table as `RData` object (see code under `./dev/gis_mapping.R`. Let's load it:
