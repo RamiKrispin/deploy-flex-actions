@@ -17,7 +17,6 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 - Environment variables setting ✅
 - Add VScode settings.json file 
 - Add Github codespace setting
-- Add Twitter updates
 
 ## Prerequisites
 
