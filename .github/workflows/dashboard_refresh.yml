@@ -12,6 +12,6 @@ jobs:
     - name: checkout_repo
       uses: actions/checkout@v2
       with: 
-        ref: 'github-actions-testing'
+        ref: 'main'
     - name: Render Rmarkdown
       run: bash ./bash/render_dashboard.sh "RamiKrispin" "ramkrisp@umich.edu"
