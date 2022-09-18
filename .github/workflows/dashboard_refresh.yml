@@ -14,4 +14,4 @@ jobs:
       with: 
         ref: 'github-actions-testing'
     - name: Render Rmarkdown
-      run: bash .homr/rstudio/bash/dashboard_refresh.sh "RamiKrispin" "ramkrisp@umich.edu"
+      run: bash .home/rstudio/bash/dashboard_refresh.sh "RamiKrispin" "ramkrisp@umich.edu"
