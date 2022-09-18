@@ -4,11 +4,11 @@ on: [push]
 #  schedule:  
 #    - cron:  '0 */1 * * *'
 jobs:
-  name: refresh-the-dashboard
-  runs-on: ubuntu-18.04 
-  container: 
-    image: rkrispin/flex_dash_env:dev.0.0.0.9000
-  steps:
+  refresh-the-dashboard:
+    runs-on: ubuntu-18.04 
+    container: 
+      image: rkrispin/flex_dash_env:dev.0.0.0.9000
+    steps:
     - name: checkout_repo
       uses: actions/checkout@v2
       with: 
