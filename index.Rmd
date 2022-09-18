@@ -66,6 +66,17 @@ df3$trend_deaths_cases <- (df3$deaths_new +
 last_update <- paste("Last update: ", max(df$date), sep = "")
 ```
 
+<script>
+document.querySelector(".navbar-header > span.navbar-brand > span.navbar-author").innerHTML = "`r last_update`";
+</script>
+
+<style>
+.navbar-author {
+  position: absolute;
+  right: 1rem;
+}
+</style>
+
 
 # Summary
 
