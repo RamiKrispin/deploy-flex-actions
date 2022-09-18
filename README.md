@@ -918,11 +918,23 @@ jobs:
       - name: checkout_repo
         uses: actions/checkout@v2
         with: 
-          ref: 'master'
+          ref: 'main'
       - name: Render Rmarkdown
         run: bash ./bash/dashboard_refresh.sh "YOUR_GITHUB_USER_NAME" "YOUR_GITHUB_LOGIN_EMAIL"
 
 ```
+Let's review the key arguments of the above `yml` file:
+- `name` - Defines the workflow name
+- `on` - Sets the trigger method, in this case we set a schedule job and set the execution time with the `cron` argument to run every 4 hours. 
+    - The cron setting on Github Actions follows the regualr structure of minute, hour, day of the month, month, day of the week. 
+    - The [crontab guru](https://crontab.guru/) is a nice resource to translate cron settings into human language format
+- `jobs` - Defines the [jobs](https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow) to execute during the run time. We will use this argument to define 
+
+## TODO
+
+- Explain the yml file
+- Create a status badge
+- Set navbar date
 
 After setting the workflow on the Github interface, I recommend syncing the changes on the `origin` with your local branch by using `git pull`. 
 
