@@ -4,15 +4,14 @@ on: [push]
 #  schedule:  
 #    - cron:  '0 */1 * * *'
 jobs:
-  build:
-    name: refresh the dashboard
+  refresh-the-dashboard:
     runs-on: ubuntu-18.04 
     container: 
-     image: rkrispin/flex_dash_env:dev.0.0.0.9000
+      image: rkrispin/flex_dash_env:dev.0.0.0.9000
     steps:
-      - name: checkout_repo
-        uses: actions/checkout@v2
-        with: 
-          ref: 'main'
-      - name: Render Rmarkdown
-        run: bash ./bash/render_dashboard.sh "RamiKrispin" "ramkrisp@umich.edu"
+    - name: checkout_repo
+      uses: actions/checkout@v2
+      with: 
+        ref: 'github-actions-testing'
+    - name: Render Rmarkdown
+      run: bash ./bash/render_dashboard.sh "RamiKrispin" "ramkrisp@umich.edu"
