@@ -907,35 +907,48 @@ name: Dashboard Refresh
 
 on: 
   schedule:  
-    - cron:  '0 */1 * * *'
+    - cron:  '0 */12 * * *'
 jobs:
   refresh-the-dashboard:
-    runs-on: ubuntu-18.04 
+    runs-on: ubuntu-20.04  
     container: 
       image: rkrispin/flex_dash_env:dev.0.0.0.9000
     steps:
     - name: checkout_repo
       uses: actions/checkout@v2
       with: 
-        ref: 'github-actions-testing'
+        ref: 'main'
     - name: Render Rmarkdown
       run: bash ./bash/render_dashboard.sh "YOUR_GITHUB_USER_NAME" "YOUR_GITHUB_LOGIN_EMAIL"
 
 ```
 Let's review the key arguments of the above `yml` file:
 - `name` - Defines the workflow name
-- `on` - Sets the trigger method, in this case we set a schedule job and set the execution time with the `cron` argument to run every 4 hours. 
-    - The cron setting on Github Actions follows the regualr structure of minute, hour, day of the month, month, day of the week. 
+- `on` - Sets the trigger methodwe set a scheduled job and the execution time with the cron argument to run every 12 hours:
+    - The cron setting on Github Actions follows the regular structure of minute, hour, day of the month, month, and day of the week. 
+    - In the above setting, `0 */12 * * *` represents - running every 12 hours at the beginning of the hour
     - The [crontab guru](https://crontab.guru/) is a nice resource to translate cron settings into human language format
-- `jobs` - Defines the [jobs](https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow) to execute during the run time. We will use this argument to define 
+- `jobs` - Defines the [jobs](https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow) to execute during the run time. In our case, we have a single job to run, and we define it as `refresh-the-dashboard`
+- `runs-on` - Sets the OS system to run the job. So far, I have used Ubuntu-18.04. However, Github announced that they deprecated this version. Therefore, we will use the recommended version - Ubuntu-20.04. 
+- `container` - This argument enables us to run the job inside a containerized environment (which was the main reason of setting a dockerized development environment). 
+    - `image` - As the name implies, set the image name. In this case, we will use the same image we use for the development
+- `steps` - Defines the executions steps of the job using the following arguments:
+    - `name` - Defines the step name
+    - `run` - Executes code on the command line
+- We will use the following steps:
+    - Checkout from the repo (equivalent to git clone), and use the `ref` argument to define the branch we want to use for the job.
+    - Once we checked out, we can call, reference, and run files from the repo (with respect to the branch we referenced)
+    - We will use the `run` argument to call the bash script that we created to render the dashboard and push the changes
+
+
+After setting the workflow on the Github interface, I recommend syncing the changes on the `origin` with your local branch by using `git pull`.
 
 ## TODO
 
-- Explain the yml file
 - Create a status badge
 - Set navbar date
-
-After setting the workflow on the Github interface, I recommend syncing the changes on the `origin` with your local branch by using `git pull`. 
+- Test the git version
+ 
 
 # Next steps
 
