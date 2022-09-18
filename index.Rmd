@@ -62,7 +62,10 @@ df3$trend_deaths_cases <- (df3$deaths_new +
                         dplyr::lag(df3$deaths_new,4) + 
                         dplyr::lag(df3$deaths_new,5) + 
                         dplyr::lag(df3$deaths_new,6)) /7
+
+last_update <- paste("Last update: ", max(df$date), sep = "")
 ```
+
 
 # Summary
 
