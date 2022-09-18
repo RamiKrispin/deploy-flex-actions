@@ -5,7 +5,7 @@ on:
     - cron:  '0 */4 * * *'
 jobs:
   refresh-the-dashboard:
-    runs-on: ubuntu-18.04 
+    runs-on: ubuntu-20.04 
     container: 
       image: rkrispin/flex_dash_env:dev.0.0.0.9000
     steps:
