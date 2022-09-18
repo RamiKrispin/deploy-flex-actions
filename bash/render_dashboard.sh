@@ -12,8 +12,10 @@ fi
 
 Rscript -e "rmarkdown::render_site()"
 
+git config --global --add safe.directory /__w/deploy-flex-actions/deploy-flex-actions
+
 if [[ "$(git status --porcelain)" != "" ]]; then
-    git config --global --add safe.directory /__w/deploy-flex-actions/deploy-flex-actions
+    
     git config --global user.name "RamiKrispin"
     git config --global user.email "ramkrisp@umich.edu"
     git add *
