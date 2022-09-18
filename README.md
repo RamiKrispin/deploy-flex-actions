@@ -11,7 +11,7 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 - Set docker environment ✅ 
 - Set Github Pages workflow ✅ 
 - Build an example dashboard ✅ 
-- Set automation with Github Actions
+- Set automation with Github Actions ✅
 - Create documentations ✅ 
 - Add prerequisites ✅
 - Environment variables setting ✅
@@ -859,6 +859,10 @@ fi
 
 
 Rscript -e "rmarkdown::render_site()"
+
+# Fix github issue
+git config --global --add safe.directory /__w/deploy-flex-actions/deploy-flex-actions
+
 
 if [[ "$(git status --porcelain)" != "" ]]; then
     git config --global user.name $1
