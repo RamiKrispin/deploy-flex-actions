@@ -905,22 +905,21 @@ For a better context, we will rename the file name to `dashboard_refresh.yml` (m
 
 name: Dashboard Refresh
 
-on:
+on: 
   schedule:  
-    - cron:  '0 */4 * * *'
+    - cron:  '0 */1 * * *'
 jobs:
-  build:
-    name: refresh the dashboard
+  refresh-the-dashboard:
     runs-on: ubuntu-18.04 
     container: 
-     image: rkrispin/flex_dash_env:dev.0.0.0.9000
+      image: rkrispin/flex_dash_env:dev.0.0.0.9000
     steps:
-      - name: checkout_repo
-        uses: actions/checkout@v2
-        with: 
-          ref: 'main'
-      - name: Render Rmarkdown
-        run: bash ./bash/dashboard_refresh.sh "YOUR_GITHUB_USER_NAME" "YOUR_GITHUB_LOGIN_EMAIL"
+    - name: checkout_repo
+      uses: actions/checkout@v2
+      with: 
+        ref: 'github-actions-testing'
+    - name: Render Rmarkdown
+      run: bash ./bash/render_dashboard.sh "YOUR_GITHUB_USER_NAME" "YOUR_GITHUB_LOGIN_EMAIL"
 
 ```
 Let's review the key arguments of the above `yml` file:
