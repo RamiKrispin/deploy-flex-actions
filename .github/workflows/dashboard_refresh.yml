@@ -15,4 +15,4 @@ jobs:
         with: 
           ref: 'main'
       - name: Render Rmarkdown
-        run: bash ./bash/dashboard_refresh.sh "RamiKrispin" "ramkrisp@umich.edu"
+        run: bash ./bash/render_dashboard.sh "RamiKrispin" "ramkrisp@umich.edu"
