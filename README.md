@@ -11,7 +11,7 @@ This repo provides a step-by-step guide and a template for deploying and automat
 - **Dashboard scope**
 - **Dashboard prototype**
 - **Set Docker environment**
-- **Castumize the image**
+- **Customize the image**
 - **Code prototype**
 - **Dashboard development**
 - **Deploy on Github Pages**
@@ -57,7 +57,7 @@ Github Actions is a CI/CD tool enabling scheduling and triggering jobs (or scrip
 
 ### Why Docker?
 
-Docker is a CI/CD tool that enables seamless code deployment from the development to production by using the environment framework. By creating OS-level virtualization, it can package an application and its dependencies in a virtual container. Or in other words, the code that was developed and tested in the dev env will run with the exact same env (e.g., the same OS, compilers, packages, and other dependencies) on prod. Docker can run natively on Linux systems and with Docker Desktop (or equivalent) on macOS and Windows OS.
+Docker is a CI/CD tool that enables seamless code deployment from development to production environments. By creating OS-level virtualization, it can package an application and its dependencies in a virtual container. Or in other words, the code that was developed and tested in the dev env will run with the exact same env (e.g., the same OS, compilers, packages, and other dependencies) on prod. Docker can run natively on Linux systems and with Docker Desktop (or equivalent) on macOS and Windows OS.
 
 ### Docker + R = ❤️❤️❤️
 
@@ -98,7 +98,7 @@ To install Docker Desktop, go to the [Docker Desktop website](https://www.docker
 
 The Docker Hub is the "Github" of container images. It enables you to store your container images and pull and use other users' containers. To register and create an account go to https://hub.docker.com and follow the registration instructions. 
 
-After installing Docker Desktop and setting account on Docker Hub, open on your machine Docker Desktop, and from the commend line login to Docker Hub:
+After installing Docker Desktop and setting account on Docker Hub, open Docker Desktop, and from the command line, login to Docker Hub:
 
 ``` shell
  docker login
@@ -115,11 +115,11 @@ Login Succeeded
 Logging in with your password grants your terminal complete access to your account.
 For better security, log in with a limited-privilege personal access token. Learn more at https://docs.docker.com/go/access-tokens/
 ```
-**Note:** Docker Hub is completly public (at the free tier), anything image you push will be available for all other users. **NEVER** store on your Docker images credintials, passwords, or any other sensative information.
+**Note:**  Docker Hub is completely public (at the free tier). Any image you push and store there will be available for all other users. **NEVER** store credentials, passwords, or any other sensitive information on your Docker images.
 
 ### Setting environment variables
  
-It is a good practice to use in a project like this environment variables. It will enables us to, semlessly, adjust the project to the user setting (e.g., local folders, and settings) without changing the project core code. We will use in this tutorial the following environment variables:
+It is a good practice to use in a project like this environment variables. It will enable us to seamlessly adjust the project to the user setting (e.g., user local folders and RStudio settings) without changing the project core code. We will use in this tutorial the following environment variables:
 - `FLEX_IMAGE` - The development image name, if you are using the tutorial image it should be set as `rkrispin/flex_dash_env:dev.0.0.0.9000`. Otherwise, set it to the one you plan to use
 - `TUTORIAL_WORKING_DIR` - The path for the tutorial folder (e.g., the cloned repository). This variable will be used to bind your Docker container with your local machine. This will be mainly relevant if you are using the RStudio server as your working IDE
 - `RSTUDIO_CONFIG_PATH` - The path for the local RStudio config folder. Typically it would be your home directory + `.config/rstudio`. This variable will be used to bind your  
@@ -127,7 +127,7 @@ It is a good practice to use in a project like this environment variables. It wi
 
 ## Repository structure
 
-Below is the list of the tutorial main folders:
+Below is the list of the tutorial repository main folders:
 
 
 ``` shell
@@ -143,18 +143,18 @@ Below is the list of the tutorial main folders:
 ├── docs
 └── images
 ```
-In brief, the above folders will be use for:
-- The `.devcontainer` folder containes the VScode Docker settings, and the `.vscode` containes the workspace (project folder) settings
+In brief, the uses of the above folders:
+- The `.devcontainer` folder contains the VScode Docker settings, and the `.vscode` contains the workspace (project folder) settings
 - We will use the `.github` folder to set the Github Actions workflows
 - The `bash` folder will be used to store bash scripts that will be used on the Github Actions workflow
 - We will use the `data` folder to store any data objects required for the dashboard
-- Throughout the development process we will use the `dev` folder to prototype the dashboard data visualizations
+- Throughout the development process, we will use the `dev` folder for prototype the dashboard data visualizations
 - We will store and draw.ai diagrams we will create for this tutorial
-- The `docker` folder containes all the Docker image settings files (e.g., `Dockerfile` and some helper files)
+- The `docker` folder contains all the Docker image settings files (e.g., `Dockerfile` and some helper files)
 - The `docs` folder will be used to store the rendered dashboard files
-- All the images in the README file will be stored on the `image` folder
+- All the images in the README file will be stored in the `image` folder
 
-Most of it, I hope, will make more senese as you progress in the tutorial stages.
+Most of it, I hope, will make more sense  as you progress in the tutorial stages.
 
 
 ## Workflow
@@ -186,7 +186,7 @@ Expected dependencies:
 
 ## Dashboard prototype
 
-After setting a clear scope, I found that it useful to prototype and put your thoughts on a piece of paper, [drow.io](https://www.diagrams.net/), iPad, or any other tool you find useful. The goal is to translate the scope into some sketches to understand the data inputs, required transformation, type of visualization, etc. In addition, a narrow scope with a good prototype will potentially save you some time and cycles when starting to code the dashboard. That being said, you should stay open-minded to changes in the final output, as what may look nice on the sketch may turn out less appealing on the final output. 
+After setting a clear scope, I found that it is useful to prototype and put your thoughts on a piece of paper, [drow.io](https://www.diagrams.net/), iPad, or any other tool you find useful. The goal is to translate the scope into some sketches to understand the data inputs, required transformation, type of visualization, etc. In addition, a narrow scope with a good prototype will potentially save you some time and cycles when starting to code the dashboard. That being said, you should stay open-minded to changes in the final output, as what may look nice on the sketch may turn out less appealing on the final output. 
 
 <img src="images/dash_prototype01.png" width="100%" />
 
@@ -218,7 +218,7 @@ Once we have defined the scope and have a simple prototype, we better understand
 
 ## Set Docker environment
 
-The main requirement for build a Docker image, besides having Docker Desktop, is a `Dockerfile` file. The `Dockerfile` containes a list of instruction for the `docker build` command about how to constract the image. There are multiple approaches for setting a Docker environment with the [Dockerfile](https://docs.docker.com/engine/reference/builder/). My approach is to minimize the `Dockerfile` length by using utility files and automating the process by using `bash` scrips. This makes the `Dockerfile` cleaner, yielding a smaller image size with fewer layers. Below is the tree of the `docker` folder in this tutorial:
+Besides having Docker Desktop, the main requirement for building a Docker image is a [Dockerfile](https://github.com/RamiKrispin/deploy-flex-actions/blob/main/docker/Dockerfile) file. The `Dockerfile` contains a list of instructions for the `docker build` command about how to construct the image. There are multiple approaches for setting up a Docker environment with the [Dockerfile](https://docs.docker.com/engine/reference/builder/). My approach is minimizing the Dockerfile length by using utility files and automating the process using `bash` scrips. This makes the `Dockerfile` cleaner, yielding a smaller image size with fewer layers. Below is the tree of the `docker` folder in this tutorial:
 
 ``` shell
 .
@@ -235,7 +235,7 @@ This includes the following four files:
 - `build_docker.sh` - a bash script to automate the build of the image and push to Docker Hub
 - `install_packages.R` - an R script that installs the dependencies of the project as set in the `packages.json` file
 - `install_packages.R` - an R script that installs the Python dependencies of the project as set in the `packages.json` file
-- `install_quarto.sh` - a Bash script that install Quarto
+- `install_quarto.sh` - a Bash script that installs Quarto
 - `packages.json` - a JSON file with a list of the project packages and their version
 
 Before diving into more details, let's review the `Dockerfile`.
@@ -331,13 +331,13 @@ The above Dockerfile has the following components:
     - The `ENV` argument enables to set of environment variables that are available both during the build and run time (as opposed to `ARG`s variables that are available only during the build time).
     - One way to set dynamic environment variables is to set them first as arguments and then assign them to environment variables. Not sure if this is the best practice, but it is a convenience to have some of the arguments available after the build time, mainly for debugging.
 
-    To run R in VScode, we will use [radian](https://github.com/randy3k/radian), an alternative R console with multiline editing and rich syntax highlight. The radian is Python based therefore, we will set Conda to set a Python environment. The `CONDA_ENV` and `PYTHON_VER` will be used to set the Conda environment and its version. In addition, we will use the `QUARTO_VERSION` argument to set the Quarto version.
+    To run R in VScode, we will use [radian](https://github.com/randy3k/radian), an alternative R console with multiline editing and rich syntax highlight. Radian is Python-based, therefore, we will set Conda to set a Python environment. The `CONDA_ENV` and `PYTHON_VER` will be used to set the Conda environment and its version. In addition, we will use the `QUARTO_VERSION` argument to set the Quarto version.
 
 - **Disabling the authentication** - By default, the RStudio server requires a user name and password. We will use the `ENV` command to define the environment variable `USER` and set it as `rstudio` and the `CMD` command to disable the authentication step.
 - **Installing Dependencies** - Generally, rocker images will have most of the Debian packages, C/C++ compliers, and other dependencies. However, often you may need to install additional requirements based on the packages you add to the image. In our case, we will use the `RUN` command to install [jq](https://stedolan.github.io/jq/), a command line tool for parsing `JSON` files, and the [libxml2](https://packages.debian.org/search?keywords=libxml2) Debian package that is required to install the [lubridate](https://lubridate.tidyverse.org/) package.
 - **Installing the R packages** - To install additional R packages, we will make a new directory inside the image called `packages` and copy the `install_packages.R` and `packages.json` files that will be used to install the required R packages. 
 - **Install Quarto** - We will use the `install_quarto.sh` bash script to install Quarto. We will use the `QUARTO_VERSION` argument to set the version (1.1.149).
-- **Set Python Environment** - We will set Python environment with Conda and than install [radian](https://github.com/randy3k/radian). We will set Python environment with Conda and then install [radian](https://github.com/randy3k/radian). This step requires if you are planning to develop with VScode (or down the road when [flexdashboard](https://quarto.org/docs/faq/rmarkdown.html#i-use-x-bookdown-blogdown-etc..-what-is-the-quarto-equivalent) will be available for Python, [Julia](https://julialang.org/), and [Observable](https://observablehq.com/) with [Quatro](https://quarto.org/))
+- **Set Python Environment** - We will set the Python environment with Conda and then install [radian](https://github.com/randy3k/radian). This step requires if you are planning to develop with VScode (or down the road when [flexdashboard](https://quarto.org/docs/faq/rmarkdown.html#i-use-x-bookdown-blogdown-etc..-what-is-the-quarto-equivalent) will be available for Python, [Julia](https://julialang.org/), and [Observable](https://observablehq.com/) with [Quatro](https://quarto.org/))
 - **Rprofile** - we will copy the `.Rprofile` file with the VScode settings to the image
 - **Expose port** - Last but not least, we will use the `EXPOSE` command to expose port 8787 (default) for the RStudio server (as set on the base docker).
 
@@ -420,7 +420,7 @@ Note that the JSON file has three sections:
 - `python_packages` - defines the Python packages to install on the conda environment
 
 
-To build the Docker image, we will use `build_docker.sh` file, which builds and push the image to Docker Hub:
+To build the Docker image, we will use `build_docker.sh` file, which builds and pushes the image to Docker Hub:
 
 ``` bash
 #!/bin/bash
@@ -457,7 +457,7 @@ Of the two, when working with flaxdashboard, RStudio is the preferred choice. Th
 
 ### Setting environment with RStudio server
 
-There are multiple methods to spin a docker image into a running containter. Before going to the robust method using the `docker-compose`, let's review the basic method with the `run` command:
+There are multiple methods to spin a docker image into a running container. Before going to the robust method using the `docker-compose`, let's review the basic method with the `run` command:
 
 ``` shell
 docker run -d -p 8787:8787 rkrispin/flex_dash_env:dev.0.0.0.9000
@@ -465,7 +465,7 @@ docker run -d -p 8787:8787 rkrispin/flex_dash_env:dev.0.0.0.9000
 
 The `docker run` command (or `run` in short) enables you to launch a container. In the above example, we used the following arguments:
 * `-d` (or detach mode) to run the container in the background and 
-* `-p` argument maps between the container and the local machine ports, where the right to the `:` symbol represents the port that is exposed on the container and the one on the left represents the port on the local machine. In the above example, we mapped port 8787 on the docker to port 8787 on the local machine
+* `-p` argument maps between the container and the local machine ports, where the right to the `:` symbol represents the port that is exposed on the container, and the one on the left represents the port on the local machine. In the above example, we mapped port 8787 on the docker to port 8787 on the local machine
 
 We close the `run` command with the name of the image we want to launch.
 
@@ -499,7 +499,7 @@ Now you can go to your browser and use `http://localhost:8787` to access the Rst
 
 Does it sufficient to start developing our dashboard? The answer is **NO**! 
 
-We have a functional environment, yet we are still missing a couple of elements to make this container fully functional as a development environment. For example, although we can access the container from the browser, it is still an isolated environment as we can't save or commit changes in the code. Let's add the `-v` argument to mount a local volume with the container. This will enable you to work inside the container and read and write data from your local machine. If the container is already running, use the `docker kill` (yes, not the best wording for a command...) following by the container ID (see the `docker ps` output for the container ID) to stop the running containers:
+We have a functional environment, yet we are still missing a couple of elements to make this container fully functional as a development environment. For example, although we can access the container from the browser, it is still an isolated environment as we can't save or commit changes in the code. Let's add the `-v` argument to mount a local volume with the container. This will enable you to work inside the container and read and write data from your local machine. If the container is already running, use the `docker kill` (yes, not the best wording for a command...), followed by the container ID (see the `docker ps` output for the container ID) to stop the running containers:
 
 ``` shell
 docker kill ac26ec61e71b
@@ -510,17 +510,17 @@ Let's repeat the previous command and add the `-v` argument to mount the contain
 docker run -d -p 8787:8787 -v $TUTORIAL_WORKING_DIR:/home/rstudio/flexdash rkrispin/flex_dash_env:dev.0.0.0.9000
 ```
 
-You can see now, after binding the local folder to the docker with the `-v` argument the `flexdash` folder (marked with a green rectangle on the next screenshot) is now available inside the container:
+You can see now, after binding the local folder to the docker with the `-v` argument, the `flexdash` folder (marked with a green rectangle on the next screenshot) is now available inside the container:
 
 <img src="images/rstudio02.png" width="100%" />
 
-Note that `$TUTORIAL_WORKING_DIR` is the environment variable that I set with the local folder path on my machine, and `/home/rstudio/` is the root folder on the container, and `flexdash` is the name of the mounted folder inside the container. To run it on your local machine, you should modify in the following example `YOUR_LOCAL_PATH` with your folder local path and `FOLDER_NAME` with the name you want to use for this mount volume inside the container:
+Note that the `$TUTORIAL_WORKING_DIR` environment variable represents the local folder path on my machine, the `/home/rstudio/` folder is the root folder on the container, and `flexdash` is the name of the mounted folder inside the container. To run it on your local machine, you should modify in the following example `YOUR_LOCAL_PATH` with your folder local path and `FOLDER_NAME` with the folder name you want to use inside the container:
 
 ``` shell
 docker run -d -p 8787:8787 -v YOUR_LOCAL_PATH:/home/rstudio/FOLDER_NAME rkrispin/flex_dash_env:dev.0.0.0.9000
 ```
 
-Does it sufficent to start develop our dashboard? Technicly, yes, we can now develop and test our code inside the container and save the changes on the local folder (and commit the changes with `git`).  But before we continue, let's mount our local RStudio config file with the one on the container. This will  mirror your local RStudio setting to the RStudio server running inside the container:
+Does it sufficient to start developing our dashboard? Technically, yes, we can now develop and test our code inside the container and save the changes on the local folder (and commit the changes with `git`).  But before we continue, let's mount our local RStudio config file with the one on the container. This will  mirror your local RStudio setting to the RStudio server running inside the container:
 
 ``` shell
 docker run -d -p 8787:8787 \
@@ -554,7 +554,7 @@ services:
         target: "/home/rstudio/.config/rstudio"
 ```
 
-Once we understand how `docker run` is working, it is straightforward to understand, set, and modify the above `docker-compose.yml` file according to your needs. As before, we set the image, ports, and volumes in the corresponding sections of the `yaml` file. Note that I am using three environment variables to set the docker image (`FELX_IMAGE`), the local folder to mount (`TUTORIAL_WORKING_DIR`), and the RStudio config file (`RSTUDIO_CONFIG_PATH`). Typically, this file is saved on the project/repository root folder. To launch the docker, from the path of the file, run on the command line:
+Once we understand how `docker run` is working, it is straightforward to understand, set, and modify the above `docker-compose.yml` file according to your needs. As before, we set the image, ports, and volumes in the corresponding sections of the `yaml` file. Note that I am using three environment variables to set the docker image (`FELX_IMAGE`), the local folder to mount (`TUTORIAL_WORKING_DIR`), and the RStudio config file (`RSTUDIO_CONFIG_PATH`). Typically, this file is saved on the project/repository root folder. To launch the Docker container, from the path of the file, run on the command line:
 
 ``` shell
 docker-compose up -d
@@ -572,7 +572,7 @@ The main advantage of VScode is the seamless integration with Docker. While it i
 
 **Setting**
 
-To set containerized environment with VScode, we will create the `devcontainer.json` file under the `.devcontainer` folder. The `devcontainer.json` has the same functionality as the `docker-compose.yml` file. It provides VScode a set of instructions about the Docker environment settings. Below you can see the `devcontainer.json` we will use in this project:
+To set containerized environment with VScode, we will create the `devcontainer.json` file under the `.devcontainer` folder. The `devcontainer.json` has the same functionality as the `docker-compose.yml` file. It provides VScode with a set of instructions about the Docker environment settings. Below you can see the `devcontainer.json` we will use in this project:
 
 ``` JSON
 {
@@ -615,7 +615,7 @@ To set containerized environment with VScode, we will create the `devcontainer.j
 - `python.defaultInterpreterPath` under the setting argument is used to define the default Python path for the Python interpreter. We will use the conda environment we set on the Dockerfile (`flex_dashboard`) as the default.
 The extensions section, as the name implies, defines the environment extensions
 - `mount` - enables binding between the local folders and those inside the docker. The nice thing about VScode is that you don't need to mount your project folder with the container. As example, I mount the local folder (using the TUTORIAL_WORKING_DIR environment variable) with the home directory inside the Docker.
-- `remoteEnv` - can be used to set environment variables. As example, I set two environment variables `VAR1` and `VAR2`
+- `remoteEnv` - can be used to set environment variables. As an example, I set two environment variables - `VAR1` and `VAR2`
 - `postCreateCommand` - set the command to run after the launch of the container is done. In the case above, we set `radian` to be the default.
 
 **Open the folder inside a container**
@@ -632,7 +632,7 @@ You can test your environment by opening the terminal. You should expect to see 
 
 Last but not least, if you make any changes in the image, you will have to refresh the environment by selecting the `Rebuild Container` option (click on the `><` symbol to open the container menu).
 
-## Castumize the image
+## Customize the image
 
 If the above packages (in the `packages.json` file) meet your requirements, then you are good to go and start to develop (with minimal effort in setting your global environment variables). If you have additional or different requirements, you can update the `packages.json` file according to your environment requirements and re-build the docker image using the `build_docker.sh` file. The only caveat for this is that for some packages, you may need to install additional **Debian** packages and may need to update the `Dockerfile` accordingly.
 
@@ -698,7 +698,7 @@ And customized the plot (e.g., add titles, legends, trend line, etc.):
 
 <br>
 
-Using the same logic, I create similar plot for the new death cases:
+Using the same logic, I create a similar plot for the new death cases:
 
 <br>
 
@@ -720,9 +720,9 @@ output_dir: docs
 
 This will direct the output of the flexdashboard files to the `docs` folder, which will enable to build a site with Github Pages.
 
-### Create new flexdashboard template
+### Create a new flexdashboard template
 
-It is strightforward to create a new flexdashboard template with RStudio, using the `File` menu and select `New File` and `R markdown...` options:
+It is straightforward to create a new flexdashboard template with RStudio - open the `File` menu and select the `New File` and `R markdown...` options:
 
 <br>
 
@@ -749,11 +749,11 @@ output:
     vertical_layout: fill
 ---
 ```
-**Note:** As far as I know, there is now built-in Rmarkdown template in VScode, therefore, if you are using VScode, you can copy the above yaml header to your `Rmd` file.
+**Note:** As far as I know, there is no simple way to create a flexdashboard template in VScode. Therefore, if you are using VScode, you can copy the above `yaml` header to your `Rmd` file.
 
 We will name the template file as `index.Rmd`, which will generate an `index.html` that will be used as the website file.
 
-You can check if you setting of your `_site.yml` file done properly by rendering the file. At the first run it expected to create the `docs` folder and create the website files:
+You can check if the setting of the `_site.yml` file was done properly by rendering the `index.Rmd` file. At the first run, it expected to create the `docs` folder with the website files:
 
 ```
 .
@@ -803,10 +803,10 @@ YAY! we have the dashboard set, let's deploy it on Github pages.
 
 ## Deploy on Github Pages
 
-By this point, about 95% of the work is done. Setting a Github Page simply required a website files under the docs folder, which we already created. 
+By this point, about 95% of the work is done. Setting a Github Page required the website files under the `docs` folder, which we already created. 
 
 ### Setting website
-On the repo main menu, select the `Settings` (marked in purple) tab and then the `Pages` option (marked in green) to open the Github Pages settings 
+On the repo main menu, select the `Settings` (marked in purple) tab and then the `Pages` option (marked in green) to open the Github Pages settings: 
 
 <br>
 
