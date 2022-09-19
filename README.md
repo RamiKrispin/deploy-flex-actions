@@ -30,6 +30,7 @@ This repo provides a step-by-step guide and a template for deploying and automat
 - Add prerequisites ✅
 - Environment variables setting ✅
 - Create a status badge
+- Set version and release version
 - Add VScode settings.json file 
 - Add Github codespace setting
 
@@ -1062,7 +1063,9 @@ It is always recommand to start with simple example and than add complexity. Goo
 
 ## Next steps
 
-With the expected release of flexdashboard to the Quarto ecosystem, I plan to translate this tutorial to Julia, Observable, and Python. In additon, all feedback is welcome! If you have any feedback about the tutorial or you found some issue with the code, please feel free to open an issue. 
+This is the first version of this tutorial. There are plantly of other items that due to time limitation I did not cover or required additional iturations, such as the VScode R settings. In addition, with the expected release of flexdashboard to the Quarto ecosystem, I would love to translate this tutorial to Julia, Observable, and Python. 
+
+Last but not least, all feedback is welcome! If you have any feedback about the tutorial or you found some issue with the code, please feel free to open an issue. 
 
 ## License
 
