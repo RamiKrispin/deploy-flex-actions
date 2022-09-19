@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libharfbuzz-dev \
     libfontconfig1-dev \
     git \
+    vim \
     && rm -rf /var/lib/apt/lists/*
 
 # installing R packages
@@ -64,5 +65,8 @@ RUN . /root/.bashrc \
 
 RUN echo "conda activate $CONDA_ENV" >> ~/.bashrc
 RUN Rscript packages/install_python.R
+
+# Add Rprofile with VScode settings
+COPY .Rprofile ~/
 
 EXPOSE 8787
