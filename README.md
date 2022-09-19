@@ -1,11 +1,25 @@
 # Deploy Flexdashboard on Github Pages with Github Actions and Docker
 
-<img src="images/wip.png" width="10%" /> Work in progress, pre-spelling check...
+This repo provides a step-by-step guide and a template for deploying and automating a [flexdashboard](https://pkgs.rstudio.com/flexdashboard/) dashboard on [Github Pages](https://pages.github.com/) with [Docker](https://www.docker.com/) and [Github Actions](https://github.com/features/actions).
 
+### Table of content:
 
-This repo provides a step-by-step guide and a template for deploying and refreshing a [flexdashboard](https://pkgs.rstudio.com/flexdashboard/) dashboard on [Github Pages](https://pages.github.com/) with [Docker](https://www.docker.com/) and [Github Actions](https://github.com/features/actions).
-
-<a href='https://github.com/RamiKrispin/coronavirus_dashboard'><img src="images/flexdashboard_example.png" width="100%" /></a> 
+- **Motivation** 
+- **Tutorial prerequisites** 
+- **Repository structure**
+- **Workflow**
+- **Dashboard scope**
+- **Dashboard prototype**
+- **Set Docker environment**
+- **Castumize the image**
+- **Code prototype**
+- **Dashboard development**
+- **Deploy on Github Pages**
+- **Testing**
+- **Set automation with Github Actions**
+- **Summary**
+- **Next steps**
+- **License**
 
 ## TODO
 - Set docker environment ✅ 
@@ -15,10 +29,44 @@ This repo provides a step-by-step guide and a template for deploying and refresh
 - Create documentations ✅ 
 - Add prerequisites ✅
 - Environment variables setting ✅
+- Create a status badge
 - Add VScode settings.json file 
 - Add Github codespace setting
 
-## Prerequisites
+## Motivation
+
+As its name implies, the flexdashboard package provides a flexible framework for creating dashboards. It is part of the [Rmarkdown](https://rmarkdown.rstudio.com/) ecosystem, and it has the following features:
+* Simple
+* Set the dashboard layout with the use of [rows and columns format](https://pkgs.rstudio.com/flexdashboard/articles/layouts.html)
+* Customize the dashboard theme using CSS or the [bslib](https://pkgs.rstudio.com/flexdashboard/articles/theme.html) package
+* Use built-in widgets such as [value boxes](https://pkgs.rstudio.com/flexdashboard/articles/using.html#value-boxes) and [gauges](https://pkgs.rstudio.com/flexdashboard/articles/using.html#gauges)
+* Create interactive (and serverless) dashboards leveraging R data visualization tools (e.g., Plotly, highcharter, dychart, leaflet, etc.), tables (gt, reactable, reactablefrm, kable, etc.), and [htmlwidges](https://pkgs.rstudio.com/flexdashboard/articles/using.html#html-widgets) tools such as crosstalk.
+* Build dynamic dashboards with [Shiny](https://pkgs.rstudio.com/flexdashboard/articles/shiny.html) 
+
+This tutorial will focus on deploying flexdashboard to Github Pages and automating the dashboard data refresh with Github Actions and Docker. Github and Docker offer both enterprise and free tools. Throughout this tutorial, we will leverage the free versions.
+
+<a href='https://github.com/RamiKrispin/coronavirus_dashboard'><img src="images/flexdashboard_example.png" width="100%" /></a> 
+
+### When to use Github Actions?
+
+Github Actions is a CI/CD tool enabling scheduling and triggering jobs (or scripts). In the context of R, here are some useful use cases:
+- Package testing - Triggering R CMD Check when pushing new code (see this [example](https://github.com/RamiKrispin/coronavirus/actions/workflows/main.yml)) 
+- Data automation - Build data pipelines with [Rmarkdown](https://ramikrispin.github.io/coronavirus/data_pipelines/covid19_cases.html) or pull data from [APIs](https://github.com/RamiKrispin/USelectricity/blob/fe742c8756f885a9cbb6dcc9bcf24e1e1ede69ce/.github/workflows/main.yml#L19)
+- Refresh data, rerender flexdashboard and redeploy on Github Pages (see [coronavirus](https://ramikrispin.github.io/coronavirus_dashboard/) and [covid19italy](https://ramikrispin.github.io/italy_dash/) packages supporting dashboards)
+
+### Why Docker?
+
+Docker is a CI/CD tool that enables seamless code deployment from the development to production by using the environment framework. By creating OS-level virtualization, it can package an application and its dependencies in a virtual container. Or in other words, the code that was developed and tested in the dev env will run with the exact same env (e.g., the same OS, compilers, packages, and other dependencies) on prod. Docker can run natively on Linux systems and with Docker Desktop (or equivalent) on macOS and Windows OS.
+
+### Docker + R = ❤️❤️❤️
+
+Docker is a great tool for automating tasks in R, in particular, when deploying R code with Github Actions (e.g., R CMD Check, Rmarkdown, Quarto, or Flexdashboard). In this tutorial, we will build a development environment and use it to build the dashboard and then leverage it to deploy it on Github Actions. There are two main IDEs for developing with Docker in R:
+- RStudio server 
+- VScode
+
+We will set cover how to set a development environment with the two and discuss the pros and cons of each IDE.
+
+## Tutorial prerequisites
 
 This tutorial was built under the assumption that no previous (or minimum) experience with Docker and Github Actions. While it covers some of the basics of Docker that will help you deploy a flexdashboard with Docker, it is not a Docker tutorial. If you wish to dive deeper into Docker and Github Actions, I highly recommend checking the following tutorials:
 
@@ -27,7 +75,7 @@ This tutorial was built under the assumption that no previous (or minimum) exper
 - [Docker Tutorial for Beginners - A Full DevOps Course on How to Run Applications in Containers](https://www.youtube.com/watch?v=fqMOX6JJhGo&t=6927s&ab_channel=freeCodeCamp.org) by Moonshot (via freeCodeCamp)
 - [Docker Tutorial for Beginners](https://www.youtube.com/watch?v=p28piYY_wv8&t=1534s&ab_channel=Amigoscode) by Amigoscode 
 
-Those tutorials focus on a general introduction to Docker. I also recommend watching the [Docker for R users](https://www.youtube.com/watch?v=oehhZ98o6Zk&t=1077s&ab_channel=useR%21Conference) by [Rahul Sangole](https://github.com/rsangole) and myself, from the useR! 2022 conference.
+Those tutorials focus on a general introduction to Docker. I also recommend watching the [Docker for R users](https://www.youtube.com/watch?v=oehhZ98o6Zk&t=1077s&ab_channel=useR%21Conference) tutorial by [Rahul Sangole](https://github.com/rsangole) and myself, from the useR! 2022 conference.
 
 ### General requirements
 
@@ -35,13 +83,13 @@ To run this tutorial, you will need the following requirements:
 - Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - Have a [Docker Hub](https://hub.docker.com/) account
 - Have a [Github](https://github.com) account
-- Set some environment variables
+- Set environment variables
 - Either [RStudio Desktop](https://www.rstudio.com/products/rstudio/) (preferred) or [VScode](https://code.visualstudio.com/) IDE 
 
 
 ### Installing Docker Desktop
 
-To install Docker Desktop, go to [Docker Desktop](https://www.docker.com/products/docker-desktop/) and follow the installation instructions based on your OS. 
+To install Docker Desktop, go to the [Docker Desktop website](https://www.docker.com/products/docker-desktop/) and follow the installation instructions based on your OS. 
 
 **Note:** Different OS (i.e., Linux, Mac, Windows) may have different system requirements. The requirements information by OS are available on the Docker Desktop [documentation](https://docs.docker.com/desktop/) under the install section.
 
@@ -66,64 +114,47 @@ Login Succeeded
 Logging in with your password grants your terminal complete access to your account.
 For better security, log in with a limited-privilege personal access token. Learn more at https://docs.docker.com/go/access-tokens/
 ```
-
-
+**Note:** Docker Hub is completly public (at the free tier), anything image you push will be available for all other users. **NEVER** store on your Docker images credintials, passwords, or any other sensative information.
 
 ### Setting environment variables
-
-We will use in this tutorial the following environment variables:
+ 
+It is a good practice to use in a project like this environment variables. It will enables us to, semlessly, adjust the project to the user setting (e.g., local folders, and settings) without changing the project core code. We will use in this tutorial the following environment variables:
 - `FLEX_IMAGE` - The development image name, if you are using the tutorial image it should be set as `rkrispin/flex_dash_env:dev.0.0.0.9000`. Otherwise, set it to the one you plan to use
 - `TUTORIAL_WORKING_DIR` - The path for the tutorial folder (e.g., the cloned repository). This variable will be used to bind your Docker container with your local machine. This will be mainly relevant if you are using the RStudio server as your working IDE
 - `RSTUDIO_CONFIG_PATH` - The path for the local RStudio config folder. Typically it would be your home directory + `.config/rstudio`. This variable will be used to bind your  
 
 
+## Repository structure
 
-## Folder structure
+Below is the list of the tutorial main folders:
+
 
 ``` shell
 .
-├── README.md
-├── _site.yml
+├── .devcontainer
+├── .github
+├── .vscode
+├── bash
 ├── data
 ├── dev
 ├── diagrams
 ├── docker
-├── docker-compose.yml
 ├── docs
-├── images
-└── index.Rmd
+└── images
 ```
+In brief, the above folders will be use for:
+- The `.devcontainer` folder containes the VScode Docker settings, and the `.vscode` containes the workspace (project folder) settings
+- We will use the `.github` folder to set the Github Actions workflows
+- The `bash` folder will be used to store bash scripts that will be used on the Github Actions workflow
+- We will use the `data` folder to store any data objects required for the dashboard
+- Throughout the development process we will use the `dev` folder to prototype the dashboard data visualizations
+- We will store and draw.ai diagrams we will create for this tutorial
+- The `docker` folder containes all the Docker image settings files (e.g., `Dockerfile` and some helper files)
+- The `docs` folder will be used to store the rendered dashboard files
+- All the images in the README file will be stored on the `image` folder
 
-## Motivation
+Most of it, I hope, will make more senese as you progress in the tutorial stages.
 
-As its name implies, the flexdashboard package provides a flexible framework for creating dashboards. It is part of the [Rmarkdown](https://rmarkdown.rstudio.com/) ecosystem, and it has the following features:
-* Simple
-* Set the dashboard layout with the use of [rows and columns format](https://pkgs.rstudio.com/flexdashboard/articles/layouts.html)
-* Customize the dashboard theme using CSS or the [bslib](https://pkgs.rstudio.com/flexdashboard/articles/theme.html) package
-* Use built-in widgets such as [value boxes](https://pkgs.rstudio.com/flexdashboard/articles/using.html#value-boxes) and [gauges](https://pkgs.rstudio.com/flexdashboard/articles/using.html#gauges)
-* Create interactive (and serverless) dashboards leveraging R data visualization tools (e.g., Plotly, highcharter, dychart, leaflet, etc.), tables (gt, reactable, reactablefrm, kable, etc.), and [htmlwidges](https://pkgs.rstudio.com/flexdashboard/articles/using.html#html-widgets) tools such as crosstalk.
-* Build dynamic dashboards with [Shiny](https://pkgs.rstudio.com/flexdashboard/articles/shiny.html) 
-
-This tutorial will focus on deploying flexdashboard to Github Pages and automating the dashboard data refresh with Github Actions and Docker. Github and Docker offer both enterprise and free tools. Throughout this tutorial, we will leverage the free versions.
-
-## When to use Github Actions?
-
-Github Actions is a CI/CD tool enabling scheduling and triggering jobs (or scripts). In the context of R, here are some useful use cases:
-- Package testing - Triggering R CMD Check when pushing new code (see this [example](https://github.com/RamiKrispin/coronavirus/actions/workflows/main.yml)) 
-- Data automation - Build data pipelines with [Rmarkdown](https://ramikrispin.github.io/coronavirus/data_pipelines/covid19_cases.html) or pull data from [APIs](https://github.com/RamiKrispin/USelectricity/blob/fe742c8756f885a9cbb6dcc9bcf24e1e1ede69ce/.github/workflows/main.yml#L19)
-- Refresh data, rerender flexdashboard and redeploy on Github Pages (see [coronavirus](https://ramikrispin.github.io/coronavirus_dashboard/) and [covid19italy](https://ramikrispin.github.io/italy_dash/) packages supporting dashboards)
-
-## Why Docker?
-
-Docker is a CI/CD tool that enables seamless code deployment from dev to prod. By creating OS-level virtualization, it can package an application and its dependencies in a virtual container. Or in other words, the code that was developed and tested in the dev env will run with the exact same env (e.g., the same OS, compilers, packages, and other dependencies) on prod. Docker can run natively on Linux systems and with Docker Desktop (or equivalent) on macOS and Windows OS.
-
-## Docker + R = ❤️❤️❤️
-
-Docker is a great tool for automating tasks in R, in particular, when deploying R code with Github Actions (e.g., R CMD Check, Rmarkdown, Quarto, or Flexdashboard). In this tutorial, we will build a development environment and use it to build the dashboard and then leverage it to deploy it on Github Actions. There are two main approaches for developing with Docker in R:
-- RStudio server 
-- VScode
-
-We will cover the two and discuss the pros and cons of each approach.
 
 ## Workflow
 
@@ -154,7 +185,7 @@ Expected dependencies:
 
 ## Dashboard prototype
 
-After setting a clear scope, I found it useful to prototype and put your thoughts on a piece of paper, [drow.io](https://www.diagrams.net/), iPad, or any other tool you find useful. The goal is to translate the scope into some sketches to understand the data inputs, required transformation, type of visualization, etc. In addition, a narrow scope with a good prototype will potentially save you some time and cycles when starting to code the dashboard. That being said, you should stay open-minded to changes in the final output, as what may look nice on the sketch may turn out less appealing on the final output. 
+After setting a clear scope, I found that it useful to prototype and put your thoughts on a piece of paper, [drow.io](https://www.diagrams.net/), iPad, or any other tool you find useful. The goal is to translate the scope into some sketches to understand the data inputs, required transformation, type of visualization, etc. In addition, a narrow scope with a good prototype will potentially save you some time and cycles when starting to code the dashboard. That being said, you should stay open-minded to changes in the final output, as what may look nice on the sketch may turn out less appealing on the final output. 
 
 <img src="images/dash_prototype01.png" width="100%" />
 
@@ -184,9 +215,9 @@ Once we have defined the scope and have a simple prototype, we better understand
 
 <br>
 
-# Set Docker environment
+## Set Docker environment
 
-There are multiple approaches for setting a Docker environment with the [Dockerfile](https://docs.docker.com/engine/reference/builder/). My approach is to minimize the `Dockerfile` by using utility files and automating the process with `bash` scrip. This makes the `Dockerfile` cleaner, yielding a smaller image size with fewer layers. Below is the tree of the `docker` folder in this tutorial:
+The main requirement for build a Docker image, besides having Docker Desktop, is a `Dockerfile` file. The `Dockerfile` containes a list of instruction for the `docker build` command about how to constract the image. There are multiple approaches for setting a Docker environment with the [Dockerfile](https://docs.docker.com/engine/reference/builder/). My approach is to minimize the `Dockerfile` length by using utility files and automating the process by using `bash` scrips. This makes the `Dockerfile` cleaner, yielding a smaller image size with fewer layers. Below is the tree of the `docker` folder in this tutorial:
 
 ``` shell
 .
@@ -208,9 +239,9 @@ This includes the following four files:
 
 Before diving into more details, let's review the `Dockerfile`.
 
-## The Dockerfile
+### The Dockerfile
 
-The `Dockerfile` provides a set of instructions for the docker engine to build the image. You can think about it as the image's recipe. It has its own unique and intuitive syntax following this structure:
+The `Dockerfile` provides a set of instructions for the docker engine about how to build the image. You can think about it as the image's recipe. It has its own unique and intuitive syntax following this structure:
 
 ``` dockerfile
 COMMAND some instructions
@@ -252,6 +283,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libfribidi-dev \
     libharfbuzz-dev \
     libfontconfig1-dev \
+    git \
+    vim \
     && rm -rf /var/lib/apt/lists/*
 
 # installing R packages
@@ -284,6 +317,9 @@ RUN . /root/.bashrc \
 
 RUN echo "conda activate $CONDA_ENV" >> ~/.bashrc
 RUN Rscript packages/install_python.R
+
+# Add Rprofile with VScode settings
+COPY .Rprofile ~/
 
 EXPOSE 8787
 ```
@@ -343,6 +379,18 @@ We will define all required packages and their versions on the `packages.json` f
         {
             "package": "languageserver",
             "version":"0.3.13"
+        },
+        {
+            "package": "httpgd",
+            "version":"1.3.0"
+        },
+        {
+            "package": "markdown",
+            "version":"1.1"
+        },
+        {
+            "package": "viridis",
+            "version":"0.6.2"
         }
         
        
@@ -397,7 +445,7 @@ This `bash` script simply builds the docker and tags it as `rkrispin/flex_dash_e
 bash build_docker.sh
 ```
 
-## Lunching the development environment
+### Lunching the development environment
 
 We will review two approaches to setting a development environment using:
 - RStudio server
@@ -449,8 +497,6 @@ Now you can go to your browser and use `http://localhost:8787` to access the Rst
 
 Does it sufficient to start developing our dashboard? The answer is **NO**! 
 
-<br>
-
 We have a functional environment, yet we are still missing a couple of elements to make this container fully functional as a development environment. For example, although we can access the container from the browser, it is still an isolated environment as we can't save or commit changes in the code. Let's add the `-v` argument to mount a local volume with the container. This will enable you to work inside the container and read and write data from your local machine. If the container is already running, use the `docker kill` (yes, not the best wording for a command...) following by the container ID (see the `docker ps` output for the container ID) to stop the running containers:
 
 ``` shell
@@ -462,7 +508,7 @@ Let's repeat the previous command and add the `-v` argument to mount the contain
 docker run -d -p 8787:8787 -v $TUTORIAL_WORKING_DIR:/home/rstudio/flexdash rkrispin/flex_dash_env:dev.0.0.0.9000
 ```
 
-You can see now, after applying and refreshing the container, that the `flexdash` folder (marked with a green rectangle) is now available inside the container:
+You can see now, after binding the local folder to the docker with the `-v` argument the `flexdash` folder (marked with a green rectangle on the next screenshot) is now available inside the container:
 
 <img src="images/rstudio02.png" width="100%" />
 
@@ -472,7 +518,7 @@ Note that `$TUTORIAL_WORKING_DIR` is the environment variable that I set with th
 docker run -d -p 8787:8787 -v YOUR_LOCAL_PATH:/home/rstudio/FOLDER_NAME rkrispin/flex_dash_env:dev.0.0.0.9000
 ```
 
-Does it sufficent to start develop our dashboard? Technicly, yes, we can now develop and text our code inside the container and save the changes on the local folder (and commit the changes with `git`).  But before we continue, let's mount our local RStudio config file with the one on the container. This will  mirror your local RStudio setting to the RStudio server running inside the container:
+Does it sufficent to start develop our dashboard? Technicly, yes, we can now develop and test our code inside the container and save the changes on the local folder (and commit the changes with `git`).  But before we continue, let's mount our local RStudio config file with the one on the container. This will  mirror your local RStudio setting to the RStudio server running inside the container:
 
 ``` shell
 docker run -d -p 8787:8787 \
@@ -506,7 +552,7 @@ services:
         target: "/home/rstudio/.config/rstudio"
 ```
 
-Once you understand how `docker run` is working, it is straightforward to understand, set, and modify the above `docker-compose.yml` file according to your needs. As before, we set the image, ports, and volumes in the corresponding sections of the `yaml` file. Note that I am using three environment variables to set the docker image (`FELX_IMAGE`), the local folder to mount (`TUTORIAL_WORKING_DIR`), and the RStudio config file (`RSTUDIO_CONFIG_PATH`). Typically, this file is saved on the project/repository root folder. To launch the docker, from the path of the file, run on the command line:
+Once we understand how `docker run` is working, it is straightforward to understand, set, and modify the above `docker-compose.yml` file according to your needs. As before, we set the image, ports, and volumes in the corresponding sections of the `yaml` file. Note that I am using three environment variables to set the docker image (`FELX_IMAGE`), the local folder to mount (`TUTORIAL_WORKING_DIR`), and the RStudio config file (`RSTUDIO_CONFIG_PATH`). Typically, this file is saved on the project/repository root folder. To launch the docker, from the path of the file, run on the command line:
 
 ``` shell
 docker-compose up -d
@@ -524,7 +570,7 @@ The main advantage of VScode is the seamless integration with Docker. While it i
 
 **Setting**
 
-To set containerized environment with VScode, we will create the `devcontainer.json` file under the `.devcontainer` folder. The `devcontainer.json` has the functionality of the `docker-compose.yml` file, and it provides to VScode a set of instructions about the Docker environment. This is the `devcontainer.json` we will use in this project:
+To set containerized environment with VScode, we will create the `devcontainer.json` file under the `.devcontainer` folder. The `devcontainer.json` has the same functionality as the `docker-compose.yml` file. It provides VScode a set of instructions about the Docker environment settings. Below you can see the `devcontainer.json` we will use in this project:
 
 ``` JSON
 {
@@ -589,11 +635,11 @@ Last but not least, if you make any changes in the image, you will have to refre
 If the above packages (in the `packages.json` file) meet your requirements, then you are good to go and start to develop (with minimal effort in setting your global environment variables). If you have additional or different requirements, you can update the `packages.json` file according to your environment requirements and re-build the docker image using the `build_docker.sh` file. The only caveat for this is that for some packages, you may need to install additional **Debian** packages and may need to update the `Dockerfile` accordingly.
 
 
-# Code prototype
+## Code prototype
 
-I found it useful to create the dashboard plots based on the scope and prototype steps just before starting to build the dashboard. This enables you to prepare the data, test, and customize your ideas from the prototype step. I typically use a  [Rmarkdown](https://rmarkdown.rstudio.com/) (and now on [Quarto](https://quarto.org/)) document for that. The [Quarto doc](https://github.com/RamiKrispin/deploy-flex-actions/blob/main/dev/dataviz_prototype.qmd) I used for this tutorial is under the dev folder.
+I found it useful, before starting to work on the dashboard itself, to create all the plots I plan to use on the dashboard on a [Rmarkdown](https://rmarkdown.rstudio.com/) document (and now with [Quarto](https://quarto.org/)). This enables you to prepare the data, test, and customize your ideas from the prototype step. The [Quarto doc](https://github.com/RamiKrispin/deploy-flex-actions/blob/main/dev/dataviz_prototype.qmd) I used for this tutorial is under the `dev` folder.
 
-From this step forward, all the dashboard development and testing will be inside the development container, either with RStudio Server or VScode. I will use RStudio Server for the data visualization code prototype. To launch the container, use the `docker-compose` command:
+From this step forward, all the dashboard development and testing will be inside the development container, either with RStudio Server or VScode. I will use RStudio Server for the dashboard development. To launch the container, use the `docker-compose` command:
 
 ```shell
 docker-compose up -d
@@ -622,30 +668,48 @@ After creating the treemap plot, I realized that due to the skewness of the top 
 
 <img src="images/treemap prototype.png" width="100%" />
 
+<br>
+
 Looking into the [highcharter](https://jkunst.com/highcharter/index.html) package documentation, I came across the packed bubble chart [example](https://jkunst.com/highcharter/articles/highcharts.html#packedbubble), and decided to use it instead of the treemap:
 
+<br>
+
 <img src="images/packedbubble.png" width="100%" />
+
+<br>
 
 To generate this view, I loaded the GIS codes mapping file from the John Hopkins COVID19 tracker [repository](https://github.com/CSSEGISandData/COVID-19). This table was used to add the continent field.
 
 Next, I used the aggregate cases data to create a time series view of the worldwide daily new cases. I started with this basic plot:
 
+<br>
+
 <img src="images/new_cases_init_plot.png" width="100%" />
+
+<br>
 
 And customized the plot (e.g., add titles, legends, trend line, etc.):
 
+<br>
+
 <img src="images/new_cases_plot.png" width="100%" />
+
+<br>
 
 Using the same logic, I create similar plot for the new death cases:
 
+<br>
+
 <img src="images/new_death_cases_plot.png" width="100%" />
+
+<br>
 
 
 Now that we have the data transformation and plots finalized, we can move to the next step and paste the code on the flexdashboard template.
 
-# Dashboard development
+## Dashboard development
 
-Before we start to build the dashboard, we will have to set the `_site.yml`, which enables us to define the site options. We will use the name and output_dir arguments to define the site name and rendering output-dir, respectively:
+Before we start to build the dashboard, we will have to set the `_site.yml`, which enables us to define the site options. We will use the `name` and `output_dir` arguments to define the site name and rendering output-dir, respectively:
 
 ``` shell
 name: "COVID19 Tracker"
@@ -654,15 +718,23 @@ output_dir: docs
 
 This will direct the output of the flexdashboard files to the `docs` folder, which will enable to build a site with Github Pages.
 
-## Create new flexdashboard template
+### Create new flexdashboard template
 
 It is strightforward to create a new flexdashboard template with RStudio, using the `File` menu and select `New File` and `R markdown...` options:
 
+<br>
+
 <img src="images/file_menu.png" width="50%" />
+
+<br>
 
 Next, on the `New R Markdown` window, select `From Template` option and then the `Flex Dashboard` option:
 
+<br>
+
 <img src="images/rmarkdown_template.png" width="50%" />
+
+<br>
 
 This will generate the following template (showing only the `yaml` header):
 
@@ -719,22 +791,30 @@ You can check if you setting of your `_site.yml` file done properly by rendering
 
 Once we have the dashboard functionality prototyped on the Quarto doc, it is straightforward to populate the visualization on the dashboard template:
 
+<br>
+
 <img src="images/dashboard.png" width="100%" />
+
+<br>
 
 YAY! we have the dashboard set, let's deploy it on Github pages.
 
-# Deploy on Github Pages
+## Deploy on Github Pages
 
 By this point, about 95% of the work is done. Setting a Github Page simply required a website files under the docs folder, which we already created. 
 
-## Setting 
+### Setting website
 On the repo main menu, select the `Settings` (marked in purple) tab and then the `Pages` option (marked in green) to open the Github Pages settings 
+
+<br>
 
 <img src="images/github_pages.png" width="100%" />
 
+<br>
+
 Under the `Source` option (marked in blue) select `Deploy from a branch`, and then select the `docs` folder (marked in orange). Last but not least, click the `Save` button (marked in yellow).
 
-It might take few minutes to Github to render the website and you should see the link for the website on that page (refresh the page if you cannot see it). Github Pages use the following website address patern:
+It might take few minutes until the website is render and you should see the link for the website on that page (refresh the page if you cannot see it). Github Pages use the following website address patern:
 
 ``` shell
 https://GITHUB_USER_NAME.github.io/REPO_NAME/
@@ -756,9 +836,9 @@ https://GITHUB_USER_NAME.github.io/REPO_NAME/
 In this case, the link for this tutorial dashboard is:
 https://ramikrispin.github.io/deploy-flex-actions/
 
-# Testing
+## Testing
 
-Before we continue to the automation step with Github Actions, let's test what we have built so far. The main goal of the testing stage is to check the dashboard update step in a similar environment as it would run with Github Actions. Hence, we would render the dashboard inside the container directly from the terminal.
+Before we continue to the automation step with Github Actions, let's test what we have built so far. The main goal of the testing stage is to check the dashboard can be render and update the data in a similar environment as it would run with Github Actions. Hence, we would render the dashboard inside the container directly from the terminal.
 
 It is always a good practice to restart the container before testing. This will ensure that it will not include any packages you installed during the run time (as opposed to those installed during the build time). To reset the container, let's use the `docker-compose` command:
 
@@ -834,11 +914,11 @@ Sat 17 Sep 2022 10:22:34 AM UTC
 
 
 
-# Set automation with Github Actions
+## Set automation with Github Actions
 
-By this point, we set a development environment with Docker, built a dashboard, and deployed it on [Github Pages](https://ramikrispin.github.io/deploy-flex-actions/). The next step is to set a workflow on Github Actions which will re-render the dashboard daily to get up-to-date with the data available on the [coronavirus](https://github.com/RamiKrispin/coronavirus) package. 
+By this point, we set a development environment with Docker, built a dashboard, test it inside the container, and deployed it on [Github Pages](https://ramikrispin.github.io/deploy-flex-actions/). The next step is to set a workflow on Github Actions which will re-render the dashboard daily to get up-to-date with the data available on the [coronavirus](https://github.com/RamiKrispin/coronavirus) package. 
 
-## Set an helper script
+### Set an helper script
 
 While we can run commands directly with Github Actions using the `run` argument (we will cover it in the next section), it is limited to one command at a time. Therefore, I found it more concise and efficient to use a helper script to run multiple steps with a single `run` step. To render the dashboard and update the website with the changes, we will need the following:
 - Run the Rmarkdown render_site function from the terminal
@@ -887,23 +967,35 @@ bash bash/render_dashboard.sh "YOUR_GITHUB_USER_NAME" "YOUR_GITHUB_LOGIN_EMAIL"
 
 The file is saved under the `bash` folder, and we can now continue to the last step - setting the workflow.
 
-## Creating a Github Actions workflow
+### Creating a Github Actions workflow
 
 Let's start with creating a new workflow by opening the Actions tab (marked in yellow on the screenshot below) on the repository's main menu and selecting the `New workflow` button (marked in green).
 
+<br>
+
 <img src="images/github_actions_workflow01.png" width="100%" />
+
+<br>
 
 **Note:** The deployment to Github Pages triggered a daily workflow to refresh and deploy the website on Github Pages (marked in purple). Although the name of this action state "build and deploy", it is not refreshing and rendering the dashboard. Therefore we will have to run a dedicated action for that.
 
 In the next step, we will select the type of workflow. There is no specific built-in workflow for our use case. Therefore we will select the set up a workflow yourself (marked in green) option:
 
+<br>
+
 <img src="images/github_actions_workflow02.png" width="100%" />
+
+<br>
 
 Last but not least, we will set the workflow. Github will automatically generate a file named `main.yml` under the folder `.github/workflows/`. 
 
+<br>
+
 <img src="images/github_actions_workflow03.png" width="100%" />
 
-For a better context, we will rename the file name to `dashboard_refresh.yml` (marked in yellow above) and remove the built-in code example (marked in purple) and replace it with the following code:
+<br>
+
+To add some context, let's rename the file name to `dashboard_refresh.yml` (marked in yellow above), remove the built-in code example (marked in purple) and replace it with the following code:
 
 ``` yml
 
@@ -947,17 +1039,31 @@ Let's review the key arguments of the above `yml` file:
 
 After setting the workflow on the Github interface, I recommend syncing the changes on the `origin` with your local branch by using `git pull`.
 
-## TODO
 
-- Create a status badge
-- Set navbar date
-- Test the git version
- 
+## Summary
 
-# Next steps
+This tutorial covered the foundation of using Docker + Github Actions to deploy and continuesly update a flexdashboard dashboard on Github Pages. We review the development process, from scoping and prototyping the dashboard to developing a dockerized enviroment and setting a workflow on Github Actions to automate the dashboard. While we did not dive too deep to Docker and Github Actions, this tutorial provdes you (I hope) with a good entery point (and motivation) for using those tools for your own projects.
 
-TODO...
+So what is next? **practice**. 
 
-# License
+Docker could be painful sometime, but it worth the invsetment. There is no better way to learn it by building and get your hand "dirty" with breaking and getting "fun" errors. Here is couple of suggestions for fun projects:
+
+- Build a tracker dashboard. You probably want to find an open API that provide hour, daily, or weekly update. For example:
+    - Chicago crime tracker
+    - Seattle bike rents tracker
+    - Consumption of electricity in the US (demand and supply)
+    - Air quaility tracker
+- Deploy and run statistical and machine learning models on a streaming data:
+    - Demand for electricity forecast
+    - Weather forecast
+    - Deploy a data pipeline
+
+It is always recommand to start with simple example and than add complexity. Good luck!
+
+## Next steps
+
+With the expected release of flexdashboard to the Quarto ecosystem, I plan to translate this tutorial to Julia, Observable, and Python. In additon, all feedback is welcome! If you have any feedback about the tutorial or you found some issue with the code, please feel free to open an issue. 
+
+## License
 
 This tutorial is licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-nc-sa/4.0/) License.
