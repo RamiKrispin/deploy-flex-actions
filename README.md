@@ -799,7 +799,7 @@ Once we have the dashboard functionality prototyped on the Quarto doc, it is str
 
 <br>
 
-YAY! we have the dashboard set, let's deploy it on Github pages.
+YAY! The dashboard is ready, let's deploy it on Github pages.
 
 ## Deploy on Github Pages
 
@@ -816,13 +816,13 @@ On the repo main menu, select the `Settings` (marked in purple) tab and then the
 
 Under the `Source` option (marked in blue) select `Deploy from a branch`, and then select the `docs` folder (marked in orange). Last but not least, click the `Save` button (marked in yellow).
 
-It might take few minutes until the website is render and you should see the link for the website on that page (refresh the page if you cannot see it). Github Pages use the following website address patern:
+It might take a few minutes until the website is render and you should see the link for the website on that page (refresh the page if you cannot see it). Github Pages use the following website address patern:
 
 ``` shell
 https://GITHUB_USER_NAME.github.io/REPO_NAME/
 ```
 
-In this case the link for this tutorial dashboard is:
+In this case, the link for this tutorial dashboard is:
 
 https://ramikrispin.github.io/deploy-flex-actions/
 
@@ -830,7 +830,7 @@ https://ramikrispin.github.io/deploy-flex-actions/
 
 Under the `Source` option (marked in blue) select `Deploy from a branch`, and then select the `docs` folder (marked in orange). Last but not least, click the `Save` button (marked in yellow).
 
-It might take a few minutes for Github to render the website, and you should see the link for the website on that page (refresh the page if you cannot see it). Github Pages use the following website address pattern:
+It might take a few minutes until the website is rendered, and you should see the link for the website on that page (refresh the page if you cannot see it). Github Pages use the following template to set the website address:
 
 ```
 https://GITHUB_USER_NAME.github.io/REPO_NAME/
@@ -840,7 +840,7 @@ https://ramikrispin.github.io/deploy-flex-actions/
 
 ## Testing
 
-Before we continue to the automation step with Github Actions, let's test what we have built so far. The main goal of the testing stage is to check the dashboard can be render and update the data in a similar environment as it would run with Github Actions. Hence, we would render the dashboard inside the container directly from the terminal.
+Before we continue to the automation step with Github Actions, let's test what we have built so far. The main goal of the testing stage is to check the dashboard can be rendered and update the data in a similar environment as it would run with Github Actions. Hence, we would render the dashboard inside the container directly from the terminal.
 
 It is always a good practice to restart the container before testing. This will ensure that it will not include any packages you installed during the run time (as opposed to those installed during the build time). To reset the container, let's use the `docker-compose` command:
 
