@@ -22,6 +22,7 @@ This repo provides a step-by-step guide and a template for deploying and automat
 - **License**
 
 ## TODO
+v0.1.0:
 - Set docker environment ✅ 
 - Set Github Pages workflow ✅ 
 - Build an example dashboard ✅ 
@@ -29,6 +30,8 @@ This repo provides a step-by-step guide and a template for deploying and automat
 - Create documentations ✅ 
 - Add prerequisites ✅
 - Environment variables setting ✅
+
+v0.2.0:
 - Create a status badge
 - Set version and release version
 - Add VScode settings.json file 
