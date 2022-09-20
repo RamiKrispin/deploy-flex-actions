@@ -918,7 +918,7 @@ Sat 17 Sep 2022 10:22:34 AM UTC
 
 ## Set automation with Github Actions
 
-By this point, we set a development environment with Docker, built a dashboard, test it inside the container, and deployed it on [Github Pages](https://ramikrispin.github.io/deploy-flex-actions/). The next step is to set a workflow on Github Actions which will re-render the dashboard daily to get up-to-date with the data available on the [coronavirus](https://github.com/RamiKrispin/coronavirus) package. 
+By this point, we set a development environment with Docker, built a dashboard, tested it inside the container, and deployed it on [Github Pages](https://ramikrispin.github.io/deploy-flex-actions/). The next step is to set a workflow on Github Actions which will rerender the dashboard daily to get up-to-date with the data available on the [coronavirus](https://github.com/RamiKrispin/coronavirus) package. 
 
 ### Set an helper script
 
@@ -1022,14 +1022,14 @@ jobs:
 ```
 Let's review the key arguments of the above `yml` file:
 - `name` - Defines the workflow name
-- `on` - Sets the trigger methodwe set a scheduled job and the execution time with the cron argument to run every 12 hours:
+- `on` - Defines the trigger method of the job. In our use case, we will set a scheduled job to run every 12 hours:
     - The cron setting on Github Actions follows the regular structure of minute, hour, day of the month, month, and day of the week. 
     - In the above setting, `0 */12 * * *` represents - running every 12 hours at the beginning of the hour
     - The [crontab guru](https://crontab.guru/) is a nice resource to translate cron settings into human language format
 - `jobs` - Defines the [jobs](https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow) to execute during the run time. In our case, we have a single job to run, and we define it as `refresh-the-dashboard`
 - `runs-on` - Sets the OS system to run the job. So far, I have used Ubuntu-18.04. However, Github announced that they deprecated this version. Therefore, we will use the recommended version - Ubuntu-20.04. 
-- `container` - This argument enables us to run the job inside a containerized environment (which was the main reason of setting a dockerized development environment). 
-    - `image` - As the name implies, set the image name. In this case, we will use the same image we use for the development
+- `container` - This argument enables us to run the job inside a containerized environment (which was the main reason for setting a dockerized development environment). 
+    - `image` - As the name implies, set the image name. In this case, we will use the same image we used for the development
 - `steps` - Defines the executions steps of the job using the following arguments:
     - `name` - Defines the step name
     - `run` - Executes code on the command line
@@ -1044,29 +1044,29 @@ After setting the workflow on the Github interface, I recommend syncing the chan
 
 ## Summary
 
-This tutorial covered the foundation of using Docker + Github Actions to deploy and continuesly update a flexdashboard dashboard on Github Pages. We review the development process, from scoping and prototyping the dashboard to developing a dockerized enviroment and setting a workflow on Github Actions to automate the dashboard. While we did not dive too deep to Docker and Github Actions, this tutorial provdes you (I hope) with a good entery point (and motivation) for using those tools for your own projects.
+This tutorial covered the foundation of using Docker + Github Actions to deploy and continuously update a flexdashboard dashboard on Github Pages. We review the development process, from scoping and prototyping the dashboard to developing a dockerized environment and setting a workflow on Github Actions to automate the dashboard. While we did not dive too deep into Docker and Github Actions, I hope this tutorial provides you with a good entry point (and motivation) for using those tools for your own projects.
 
-So what is next? **practice**. 
+So what is next? **Practice**. 
 
-Docker could be painful sometime, but it worth the invsetment. There is no better way to learn it by building and get your hand "dirty" with breaking and getting "fun" errors. Here is couple of suggestions for fun projects:
+Docker could be painful sometime, but it is worth the investment. In my opinion, there is no better way to learn it than building and getting your hand "dirty" with breaking and getting "fun" errors. Here are a couple of suggestions for fun projects:
 
-- Build a tracker dashboard. You probably want to find an open API that provide hour, daily, or weekly update. For example:
+- Build a tracker dashboard. You probably want to find an open API that provides hourly, daily or weekly updates. For example:
     - Chicago crime tracker
     - Seattle bike rents tracker
     - Consumption of electricity in the US (demand and supply)
     - Air quaility tracker
-- Deploy and run statistical and machine learning models on a streaming data:
+- Deploy and run statistical and machine learning models on streaming data:
     - Demand for electricity forecast
     - Weather forecast
     - Deploy a data pipeline
 
-It is always recommand to start with simple example and than add complexity. Good luck!
+My recommendation is to start with a simple project and then add complexity. Good luck!
 
 ## Next steps
 
-This is the first version of this tutorial. There are plantly of other items that due to time limitation I did not cover or required additional iturations, such as the VScode R settings. In addition, with the expected release of flexdashboard to the Quarto ecosystem, I would love to translate this tutorial to Julia, Observable, and Python. 
+This is the first version of this tutorial. There are a couple of other topics that I did not include due to time limitations, but I would love to add them in the future. That includes topics such as Docker optimization, unit testing, more robust VSCode settings, etc. In addition, with the expected release of flexdashboard to the Quarto ecosystem, I would love to translate this tutorial to Julia, Observable, and Python.
 
-Last but not least, all feedback is welcome! If you have any feedback about the tutorial or you found some issue with the code, please feel free to open an issue. 
+Last but not least, all feedback is welcome! Please feel free to open an issue if you have any feedback about the tutorial or found some code issues.
 
 ## License
 
