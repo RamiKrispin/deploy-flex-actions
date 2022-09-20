@@ -4,22 +4,22 @@ This repo provides a step-by-step guide and a template for deploying and automat
 
 ### Table of content:
 
-- **Motivation** 
-- **Tutorial prerequisites** 
-- **Repository structure**
-- **Workflow**
-- **Dashboard scope**
-- **Dashboard prototype**
-- **Set Docker environment**
-- **Customize the image**
-- **Code prototype**
-- **Dashboard development**
-- **Deploy on Github Pages**
-- **Testing**
-- **Set automation with Github Actions**
-- **Summary**
-- **Next steps**
-- **License**
+- [**Motivation**](https://github.com/RamiKrispin/deploy-flex-actions#motivation)
+- [**Tutorial prerequisites**](https://github.com/RamiKrispin/deploy-flex-actions#tutorial-prerequisites)
+- [**Repository structure**](https://github.com/RamiKrispin/deploy-flex-actions#repository-structure)
+- [**Workflow**](https://github.com/RamiKrispin/deploy-flex-actions#workflow)
+- [**Dashboard scope**](https://github.com/RamiKrispin/deploy-flex-actions#dashboard-scope)
+- [**Dashboard prototype**](https://github.com/RamiKrispin/deploy-flex-actions#dashboard-prototype)
+- [**Set Docker environment**](https://github.com/RamiKrispin/deploy-flex-actions#set-docker-environment)
+- [**Customize the image**](https://github.com/RamiKrispin/deploy-flex-actions#customize-the-image)
+- [**Code prototype**](https://github.com/RamiKrispin/deploy-flex-actions#code-prototype)
+- [**Dashboard development**](https://github.com/RamiKrispin/deploy-flex-actions#dashboard-development)
+- [**Deploy on Github Pages**](https://github.com/RamiKrispin/deploy-flex-actions#deploy-on-github-pages)
+- [**Testing**](https://github.com/RamiKrispin/deploy-flex-actions#testing)
+- [**Set automation with Github Actions**](https://github.com/RamiKrispin/deploy-flex-actions#set-automation-with-github-actions)
+- [**Summary**](https://github.com/RamiKrispin/deploy-flex-actions#summary)
+- [**Next steps**](https://github.com/RamiKrispin/deploy-flex-actions#next-steps)
+- [**License**](https://github.com/RamiKrispin/deploy-flex-actions#next-steps)
 
 ## TODO
 v0.1.0:
