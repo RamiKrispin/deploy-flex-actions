@@ -125,7 +125,7 @@ For better security, log in with a limited-privilege personal access token. Lear
 It is a good practice to use in a project like this environment variables. It will enable us to seamlessly adjust the project to the user setting (e.g., user local folders and RStudio settings) without changing the project core code. We will use in this tutorial the following environment variables:
 - `FLEX_IMAGE` - The development image name, if you are using the tutorial image it should be set as `rkrispin/flex_dash_env:dev.0.0.0.9000`. Otherwise, set it to the one you plan to use
 - `TUTORIAL_WORKING_DIR` - The path for the tutorial folder (e.g., the cloned repository). This variable will be used to bind your Docker container with your local machine. This will be mainly relevant if you are using the RStudio server as your working IDE
-- `RSTUDIO_CONFIG_PATH` - The path for the local RStudio config folder. Typically it would be your home directory + `.config/rstudio`. This variable will be used to bind your  
+- `RSTUDIO_CONFIG_PATH` - The path for the local RStudio config folder. Typically it would be your home directory + `.config/rstudio`. This variable will be used to mirror your local RStudio settings (color theme, code snippets, panel settings, etc.) to the Rstudio server on the container.
 
 
 ## Repository structure
