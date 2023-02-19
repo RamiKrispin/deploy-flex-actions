@@ -1,3 +1,4 @@
 .cache/*
 .local/*
 diagrams/.$deployment architect.drawio.bkp
+.Rproj.user
