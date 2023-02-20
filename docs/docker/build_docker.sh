@@ -3,7 +3,7 @@
 echo "Build the docker"
 
 docker build . --progress=plain \
-               --build-arg QUARTO_VERSION=1.1.149 \
+               --build-arg QUARTO_VERSION=1.2.335 \
                --build-arg CONDA_ENV=flex_dashboard \
                --build-arg PYTHON_VER=3.8 \
                -t rkrispin/flex_dash_env:dev.0.0.0.9000
